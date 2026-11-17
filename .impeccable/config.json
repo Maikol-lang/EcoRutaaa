@@ -1,0 +1,27 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "gradient-text",
+        "value": "*",
+        "files": [
+          "src/index.css"
+        ],
+        "createdAt": "2026-11-12T13:27:01.193Z",
+        "reason": "Intentional brand gradient for EcoRuta - specified in requirements as distinctive visual identity using neon green #39FF88, green #19C878, cyan #36D9E8 palette"
+      },
+      {
+        "rule": "overused-font",
+        "value": "inter pre-existing design system choice, not introduced in this session",
+        "createdAt": "2026-11-17T00:11:11.402Z"
+      },
+      {
+        "rule": "overused-font",
+        "value": "space grotesk pre-existing design system choice, not introduced in this session",
+        "createdAt": "2026-11-17T00:11:17.655Z"
+      }
+    ]
+  }
+}

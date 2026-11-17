@@ -1,0 +1,236 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --eco-neon: #39FF88;
+    --eco-dark: #0B3D2E;
+    --eco-green: #19C878;
+    --eco-cyan: #36D9E8;
+    --eco-bg: #080D0B;
+    --eco-bg-light: #0F1A14;
+    --eco-surface: #12261C;
+    --eco-border: #1E3A2E;
+  }
+
+  * {
+    @apply border-eco-border;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-eco-bg text-white font-sans antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  ::selection {
+    @apply bg-eco-neon/30 text-white;
+  }
+
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-eco-bg;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-eco-green/50 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-eco-green;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply relative inline-flex items-center justify-center gap-2 px-6 py-3.5
+           bg-eco-neon text-eco-bg font-semibold text-base
+           rounded-lg overflow-hidden
+           transition-all duration-300 ease-out
+           hover:bg-eco-green hover:shadow-[0_0_30px_#39FF88] hover:shadow-eco-neon/30
+           active:scale-[0.98]
+           focus:outline-none focus-visible:ring-2 focus-visible:ring-eco-neon focus-visible:ring-offset-2 focus-visible:ring-offset-eco-bg;
+  }
+
+  .btn-secondary {
+    @apply relative inline-flex items-center justify-center gap-2 px-6 py-3.5
+           border border-eco-green/50 text-eco-neon font-semibold text-base
+           rounded-lg
+           bg-transparent
+           transition-all duration-300 ease-out
+           hover:bg-eco-green/10 hover:border-eco-green
+           active:scale-[0.98]
+           focus:outline-none focus-visible:ring-2 focus-visible:ring-eco-green focus-visible:ring-offset-2 focus-visible:ring-offset-eco-bg;
+  }
+
+  .btn-ghost {
+    @apply relative inline-flex items-center justify-center gap-2 px-4 py-2.5
+           text-eco-neon/80 font-medium text-sm
+           rounded-md
+           bg-transparent
+           transition-all duration-200 ease-out
+           hover:text-eco-neon hover:bg-eco-neon/10
+           active:scale-[0.98]
+           focus:outline-none focus-visible:ring-2 focus-visible:ring-eco-neon focus-visible:ring-offset-2 focus-visible:ring-offset-eco-bg;
+  }
+
+  .card {
+    @apply relative bg-eco-surface/80 backdrop-blur-sm border border-eco-border/50
+           rounded-xl overflow-hidden
+           transition-all duration-300 ease-out
+           hover:border-eco-green/30 hover:shadow-xl hover:shadow-eco-green/10;
+  }
+
+  .card-elevated {
+    @apply card bg-eco-surface border-eco-border/30 shadow-2xl shadow-eco-bg/50;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3.5
+           bg-eco-bg-light border border-eco-border/50
+           rounded-lg text-white placeholder:text-eco-green/40
+           transition-all duration-200 ease-out
+           focus:outline-none focus:border-eco-neon focus:ring-2 focus:ring-eco-neon/20
+           hover:border-eco-green/30;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1.5 px-3 py-1
+           text-xs font-medium rounded-full
+           bg-eco-green/10 text-eco-neon border border-eco-green/20;
+  }
+
+  .section-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .section-title {
+    @apply font-display text-3xl sm:text-4xl lg:text-5xl font-bold
+           text-white tracking-tight;
+  }
+
+  .section-subtitle {
+    @apply mt-4 text-lg sm:text-xl text-eco-green/80 max-w-2xl;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-eco-neon via-eco-green to-eco-cyan bg-clip-text text-transparent;
+  }
+
+  .glass-panel {
+    @apply bg-eco-surface/60 backdrop-blur-md border border-eco-border/30 rounded-2xl;
+  }
+
+  .hero-gradient {
+    @apply absolute inset-0 bg-gradient-to-br from-eco-dark/50 via-eco-bg/80 to-eco-bg pointer-events-none;
+  }
+
+  .glow-orb {
+    @apply absolute rounded-full blur-3xl opacity-30 pointer-events-none;
+  }
+
+  .glow-orb-neon {
+    @apply glow-orb bg-eco-neon/40;
+  }
+
+  .glow-orb-cyan {
+    @apply glow-orb bg-eco-cyan/30;
+  }
+
+  .glow-orb-green {
+    @apply glow-orb bg-eco-green/30;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .animate-in {
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+
+  .stagger-1 { animation-delay: 0.1s; }
+  .stagger-2 { animation-delay: 0.2s; }
+  .stagger-3 { animation-delay: 0.3s; }
+  .stagger-4 { animation-delay: 0.4s; }
+  .stagger-5 { animation-delay: 0.5s; }
+  .stagger-6 { animation-delay: 0.6s; }
+
+  .mask-gradient {
+    mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Leaflet map overrides */
+.leaflet-container {
+  @apply rounded-xl;
+  font-family: inherit !important;
+  /* Prevent zoom animation shrink/flicker */
+  transition: none !important;
+}
+
+.leaflet-zoom-animated {
+  transition: none !important;
+  will-change: transform;
+}
+
+.leaflet-popup-content-wrapper {
+  @apply bg-eco-surface border border-eco-border/50 rounded-xl shadow-2xl;
+}
+
+.leaflet-popup-content {
+  @apply text-eco-bg-light m-0;
+  color: white !important;
+}
+
+.leaflet-popup-tip {
+  @apply bg-eco-surface border border-eco-border/50;
+}
+
+.leaflet-control-zoom {
+  @apply border-eco-border/50 !important;
+}
+
+.leaflet-control-zoom a {
+  @apply bg-eco-surface text-white border-b border-eco-border/30 hover:bg-eco-green/20 !important;
+}
+
+.leaflet-control-zoom a:last-child {
+  @apply border-b-0 !important;
+}
+
+.leaflet-control-attribution {
+  @apply bg-eco-surface/80 backdrop-blur-sm text-eco-green/60 text-xs !important;
+}
