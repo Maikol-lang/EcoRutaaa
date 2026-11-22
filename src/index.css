@@ -70,12 +70,14 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    overflow-x: hidden;
   }
 
   body {
     @apply bg-[var(--bg-canvas)] text-[var(--text-primary)] font-sans antialiased;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     transition: var(--theme-transition);
+    overflow-x: hidden;
   }
 
   ::selection {

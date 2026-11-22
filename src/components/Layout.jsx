@@ -29,13 +29,13 @@ export default function Layout() {
   );
 
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--bg-canvas)]">
+    <div className="min-h-screen flex flex-col bg-[var(--bg-canvas)] w-full max-w-full overflow-x-hidden">
       {/* Header - Floating Pill Style */}
-      <header className="fixed top-4 left-4 right-4 z-50 lg:top-6 lg:left-6 lg:right-6">
+      <header className="fixed top-4 left-4 right-4 z-50 lg:top-6 lg:left-6 lg:right-6 w-full max-w-full">
         <nav className="section-container" aria-label="Navegación principal">
           <div className="h-16 bg-[var(--bg-canvas)]/80 backdrop-blur-md border border-[var(--border-subtle)] rounded-full flex items-center justify-between px-4 lg:px-6">
             {/* Logo - Left */}
-            <NavLink to="/" className="flex items-center gap-2 text-[var(--accent)]" aria-label="EcoRuta - Inicio">
+            <NavLink to="/" className="flex items-center gap-2 text-[var(--accent)] shrink-0" aria-label="EcoRuta - Inicio">
               <div className="relative">
                 <svg className="w-7 h-7" viewBox="0 0 32 32" fill="none" aria-hidden="true">
                   <circle cx="16" cy="16" r="14" stroke="currentColor" strokeWidth="2"/>
@@ -47,8 +47,8 @@ export default function Layout() {
               <span className="font-display font-bold text-lg tracking-tight hidden sm:block">EcoRuta</span>
             </NavLink>
 
-            {/* Center - Pill Navigation */}
-            <div className="flex-1 flex justify-center lg:justify-between mx-4 lg:mx-6">
+            {/* Center - Pill Navigation (Desktop only: lg+) */}
+            <div className="hidden lg:flex-1 lg:flex lg:justify-center lg:mx-6">
               <div className="bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-full p-1 flex items-center gap-0.5 whitespace-nowrap overflow-x-auto">
                 {filteredNavItems.map((item) => (
                   <NavLink
@@ -72,7 +72,7 @@ export default function Layout() {
             </div>
 
             {/* Right Section */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 shrink-0">
               {/* Theme Toggle */}
               <button
                 onClick={toggleTheme}
@@ -158,7 +158,7 @@ export default function Layout() {
                   </div>
                 </>
               ) : (
-                <div className="hidden sm:flex items-center gap-2">
+                <div className="hidden lg:flex items-center gap-2">
                   <NavLink to="/login" className="btn-ghost">Entrar</NavLink>
                   <NavLink to="/register" className="btn-primary">Registrarse</NavLink>
                 </div>
@@ -184,7 +184,7 @@ export default function Layout() {
             role="navigation"
             aria-label="Menú móvil"
           >
-            <div className="surface-panel rounded-2xl border border-[var(--border-subtle)] p-4">
+            <div className="surface-panel rounded-2xl border border-[var(--border-subtle)] p-4 shadow-xl">
               <div className="flex flex-col gap-1">
                 {filteredNavItems.map((item) => (
                   <NavLink
@@ -192,7 +192,7 @@ export default function Layout() {
                     to={item.path}
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={({ isActive }) => `
-                      flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium transition-all duration-[120ms] ease-[var(--ease-out)]
+                      flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium transition-all duration-[120ms] ease-[var(--ease-out)] min-h-[44px]
                       ${isActive
                         ? 'bg-[var(--accent)]/10 text-[var(--accent)] border border-[var(--accent)]/20'
                         : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]'
@@ -200,14 +200,20 @@ export default function Layout() {
                     `}
                     aria-current={({ isActive }) => isActive ? 'page' : undefined}
                   >
-                    <item.icon className="w-5 h-5" aria-hidden="true" />
+                    <item.icon className="w-5 h-5 shrink-0" aria-hidden="true" />
                     {item.label}
                   </NavLink>
                 ))}
                 {!isAuthenticated && (
                   <div className="flex flex-col gap-2 pt-4 border-t border-[var(--border-subtle)]">
-                    <NavLink to="/login" onClick={() => setIsMobileMenuOpen(false)} className="btn-secondary w-full justify-center">Iniciar Sesión</NavLink>
-                    <NavLink to="/register" onClick={() => setIsMobileMenuOpen(false)} className="btn-primary w-full justify-center">Registrarse</NavLink>
+                    <NavLink to="/login" onClick={() => setIsMobileMenuOpen(false)} className="btn-secondary w-full justify-center min-h-[44px]">Iniciar Sesión</NavLink>
+                    <NavLink to="/register" onClick={() => setIsMobileMenuOpen(false)} className="btn-primary w-full justify-center min-h-[44px]">Registrarse</NavLink>
+                  </div>
+                )}
+                {isAuthenticated && (
+                  <div className="flex flex-col gap-2 pt-4 border-t border-[var(--border-subtle)]">
+                    <NavLink to="/profile" onClick={() => setIsMobileMenuOpen(false)} className="btn-secondary w-full justify-center min-h-[44px]">Mi Perfil</NavLink>
+                    <NavLink to="/rewards" onClick={() => setIsMobileMenuOpen(false)} className="btn-primary w-full justify-center min-h-[44px]">Mis Puntos</NavLink>
                   </div>
                 )}
               </div>
