@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { AuthProvider } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import Layout from './components/Layout';
 import Landing from './pages/Landing';
@@ -48,9 +49,10 @@ const RouteWrapper = ({ children }) => {
 function App() {
   return (
     <Router>
-      <AuthProvider>
-        <div className="min-h-screen bg-eco-bg">
-          <Routes>
+      <ThemeProvider>
+        <AuthProvider>
+          <div className="min-h-screen bg-ivory">
+            <Routes>
             {/* Public routes without layout */}
             <Route path="/login" element={<RouteWrapper><Login /></RouteWrapper>} />
             <Route path="/register" element={<RouteWrapper><Register /></RouteWrapper>} />
@@ -70,17 +72,18 @@ function App() {
           </Routes>
           <Toaster
             position="top-right"
-            theme="dark"
-            className="bg-eco-surface border border-eco-border/50"
+            theme="light"
+            className="bg-white border border-stone-200 rounded-xl shadow-lg text-charcoal-900"
             toastOptions={{
-              className: 'bg-eco-surface border border-eco-border/50 text-white',
-              style: { background: '#12261C', border: '1px solid #1E3A2E' },
-              success: { iconTheme: { primary: '#39FF88', secondary: '#080D0B' } },
-              error: { iconTheme: { primary: '#FF4444', secondary: '#080D0B' } },
+              className: 'bg-white border border-stone-200 rounded-xl shadow-lg text-charcoal-900',
+              style: { background: '#FFFFFF', border: '1px solid #E2DED5' },
+              success: { iconTheme: { primary: '#2D5A2D', secondary: '#F0F5F0' } },
+              error: { iconTheme: { primary: '#F97316', secondary: '#FFF1F2' } },
             }}
           />
         </div>
       </AuthProvider>
+      </ThemeProvider>
     </Router>
   );
 }

@@ -1,13 +1,23 @@
-import { useState, useEffect, useRef } from 'react';
-import { gsap } from 'gsap';
+import { useState, useRef, useEffect } from 'react';
+import { useGSAP } from '@gsap/react';
+import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Leaf, Eye, EyeOff, Mail, Lock, User, Truck, MapPin, Award, Recycle, ArrowRight, CheckCircle, AlertCircle, Shield } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 gsap.registerPlugin(ScrollTrigger);
 
+const neighborhoods = [
+  'Centro Histórico', 'El Carmelo', 'San Antonio', 'La Gaitana', 'María Auxiliadora',
+  'Alfonso López', 'Ciudadela La Paz', 'El Porvenir', 'La Tribuna', 'San Pedro',
+  'Otro', 'No vivo en Girardot'
+];
+
 export default function Register() {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const { register } = useAuth();
   const navigate = useNavigate();
   const containerRef = useRef(null);
@@ -25,34 +35,30 @@ export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
 
-  const neighborhoods = [
-    'Centro Histórico', 'El Carmelo', 'San Antonio', 'La Gaitana', 'María Auxiliadora',
-    'Alfonso López', 'Ciudadela La Paz', 'El Porvenir', 'La Tribuna', 'San Pedro',
-    'Otro', 'No vivo en Girardot'
-  ];
+  // GSAP Animations with useGSAP
+  useGSAP(() => {
+    const registerCard = containerRef.current?.querySelector('.register-card');
+    const headerItems = containerRef.current?.querySelectorAll('.register-header > *');
+    const formGroups = containerRef.current?.querySelectorAll('.form-group');
+    const registerFooter = containerRef.current?.querySelector('.register-footer');
+    const benefitItems = containerRef.current?.querySelectorAll('.benefits-grid > div');
 
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      const registerCard = containerRef.current?.querySelector('.register-card');
-      const headerItems = containerRef.current?.querySelectorAll('.register-header > *');
-      const formGroups = containerRef.current?.querySelectorAll('.form-group');
-      const registerFooter = containerRef.current?.querySelector('.register-footer');
-
-      if (registerCard) {
-        gsap.fromTo(registerCard, { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out' });
-      }
-      if (headerItems?.length) {
-        gsap.fromTo(headerItems, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: 'power3.out', stagger: 0.1, delay: 0.1 });
-      }
-      if (formGroups?.length) {
-        gsap.fromTo(formGroups, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: 'power3.out', stagger: 0.06, delay: 0.2 });
-      }
-      if (registerFooter) {
-        gsap.fromTo(registerFooter, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: 'power3.out', delay: 0.4 });
-      }
-    }, containerRef);
-    return () => ctx.revert();
-  }, []);
+    if (registerCard) {
+      gsap.fromTo(registerCard, { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: 'var(--ease-out)' });
+    }
+    if (headerItems?.length) {
+      gsap.fromTo(headerItems, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: 'var(--ease-out)', stagger: 0.1, delay: 0.1 });
+    }
+    if (formGroups?.length) {
+      gsap.fromTo(formGroups, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: 'var(--ease-out)', stagger: 0.06, delay: 0.2 });
+    }
+    if (registerFooter) {
+      gsap.fromTo(registerFooter, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: 'var(--ease-out)', delay: 0.4 });
+    }
+    if (benefitItems?.length) {
+      gsap.fromTo(benefitItems, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: 'var(--ease-out)', stagger: 0.06, delay: 0.5 });
+    }
+  }, { scope: containerRef });
 
   useEffect(() => {
     let strength = 0;
@@ -101,12 +107,12 @@ export default function Register() {
     }
   };
 
-  const getStrengthColor = () => {
-    if (passwordStrength <= 1) return 'bg-red-500';
-    if (passwordStrength <= 2) return 'bg-amber-500';
-    if (passwordStrength <= 3) return 'bg-eco-cyan';
-    if (passwordStrength <= 4) return 'bg-eco-green';
-    return 'bg-eco-neon';
+  const getStrengthColor = (level) => {
+    if (level <= 1) return 'var(--accent-coral)';
+    if (level <= 2) return 'var(--accent-amber)';
+    if (level <= 3) return 'var(--accent-sky)';
+    if (level <= 4) return 'var(--accent)';
+    return 'var(--accent)';
   };
 
   const getStrengthLabel = () => {
@@ -115,38 +121,37 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-eco-bg relative overflow-hidden p-4" ref={containerRef}>
-      {/* Background orbs */}
+    <div className="min-h-screen flex items-center justify-center bg-[var(--bg-canvas)] relative overflow-hidden p-4" ref={containerRef}>
+      {/* Background orbs - editorial personality */}
       <div className="absolute inset-0" aria-hidden="true">
-        <div className="glow-orb-neon w-96 h-96 top-0 right-0 translate-x-1/2 -translate-y-1/2" />
-        <div className="glow-orb-green w-72 h-72 bottom-0 left-0 -translate-x-1/2 translate-y-1/2" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full blur-3xl" style={{ background: 'var(--accent)/0.1' }} />
       </div>
 
       <div className="relative z-10 w-full max-w-md">
         {/* Logo */}
-        <div className="text-center mb-6">
-          <NavLink to="/" className="inline-flex items-center gap-2 text-eco-neon" aria-label="EcoRuta - Inicio">
+        <div className="text-center mb-8">
+          <NavLink to="/" className="inline-flex items-center gap-2" style={{ color: 'var(--accent)' }} aria-label="EcoRuta - Inicio">
             <div className="relative">
               <svg className="w-10 h-10" viewBox="0 0 32 32" fill="none" aria-hidden="true">
                 <circle cx="16" cy="16" r="14" stroke="currentColor" strokeWidth="2"/>
                 <path d="M16 6V16L22 20" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M10 18C10 18 14 14 16 10C18 6 22 8 22 8" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
-              <span className="absolute -bottom-1 -right-1 w-2 h-2 bg-eco-neon rounded-full animate-pulse-slow" />
+              <span className="absolute -bottom-1 -right-1 w-2 h-2 rounded-full animate-pulse-slow" style={{ background: 'var(--accent)' }} />
             </div>
-            <span className="font-display font-bold text-2xl">EcoRuta</span>
+            <span className="font-display font-bold text-2xl" style={{ color: 'var(--text-primary)' }}>EcoRuta</span>
           </NavLink>
         </div>
 
         {/* Register Card */}
-        <div className="register-card card p-6 lg:p-8">
+        <div className="register-card surface-panel rounded-2xl p-6 lg:p-8">
           <div className="register-header text-center mb-8">
-            <h1 className="font-display font-bold text-2xl lg:text-3xl text-white mb-2">Crear Cuenta</h1>
-            <p className="text-eco-green/60">Únete a la comunidad EcoRuta y gana por reciclar</p>
+            <h1 className="font-display font-bold text-2xl lg:text-3xl mb-2" style={{ color: 'var(--text-primary)' }}>Crear Cuenta</h1>
+            <p style={{ color: 'var(--text-secondary)' }}>Únete a la comunidad EcoRuta y gana por reciclar</p>
           </div>
 
           {errors.form && (
-            <div className="mb-6 p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm flex items-center gap-2" role="alert">
+            <div className="mb-6 p-3 rounded-lg text-sm flex items-center gap-2" role="alert" style={{ background: 'var(--accent-coral)/10', borderColor: 'var(--accent-coral)/20', borderWidth: '1px', borderStyle: 'solid', color: 'var(--accent-coral)' }}>
               <AlertCircle className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
               {errors.form}
             </div>
@@ -155,17 +160,17 @@ export default function Register() {
           <form onSubmit={handleSubmit} className="space-y-5" noValidate>
             {/* Name */}
             <div className="form-group">
-              <label htmlFor="name" className="block text-sm font-medium text-white mb-2">Nombre Completo</label>
+              <label htmlFor="name" className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Nombre Completo</label>
               <div className="relative">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-eco-green/50" aria-hidden="true" />
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--text-muted)' }} aria-hidden="true" />
                 <input
                   type="text"
                   id="name"
                   name="name"
                   value={formData.name}
                   onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  onBlur={() => validateForm()}
-                  className={`input-field pl-12 pr-4 py-3.5 ${errors.name ? 'border-red-500/50 focus:border-red-500 focus:ring-red-500/20' : ''}`}
+                  onBlur={validateForm}
+                  className={`input-field pl-12 pr-4 py-3.5 ${errors.name ? 'border-[var(--accent-coral)]/50 focus:border-[var(--accent-coral)] focus:ring-[var(--accent-coral)]/20' : ''}`}
                   placeholder="Juan Pérez"
                   aria-invalid={errors.name ? 'true' : 'false'}
                   aria-describedby={errors.name ? 'name-error' : undefined}
@@ -173,22 +178,22 @@ export default function Register() {
                   autoComplete="name"
                 />
               </div>
-              {errors.name && <p id="name-error" className="mt-1.5 text-sm text-red-400" role="alert">{errors.name}</p>}
+              {errors.name && <p id="name-error" className="mt-1.5 text-sm" role="alert" style={{ color: 'var(--accent-coral)' }}>{errors.name}</p>}
             </div>
 
             {/* Email */}
             <div className="form-group">
-              <label htmlFor="email" className="block text-sm font-medium text-white mb-2">Correo Electrónico</label>
+              <label htmlFor="email" className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Correo Electrónico</label>
               <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-eco-green/50" aria-hidden="true" />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--text-muted)' }} aria-hidden="true" />
                 <input
                   type="email"
                   id="email"
                   name="email"
                   value={formData.email}
                   onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  onBlur={() => validateForm()}
-                  className={`input-field pl-12 pr-4 py-3.5 ${errors.email ? 'border-red-500/50 focus:border-red-500 focus:ring-red-500/20' : ''}`}
+                  onBlur={validateForm}
+                  className={`input-field pl-12 pr-4 py-3.5 ${errors.email ? 'border-[var(--accent-coral)]/50 focus:border-[var(--accent-coral)] focus:ring-[var(--accent-coral)]/20' : ''}`}
                   placeholder="tu@correo.com"
                   aria-invalid={errors.email ? 'true' : 'false'}
                   aria-describedby={errors.email ? 'email-error' : undefined}
@@ -196,21 +201,21 @@ export default function Register() {
                   autoComplete="email"
                 />
               </div>
-              {errors.email && <p id="email-error" className="mt-1.5 text-sm text-red-400" role="alert">{errors.email}</p>}
+              {errors.email && <p id="email-error" className="mt-1.5 text-sm" role="alert" style={{ color: 'var(--accent-coral)' }}>{errors.email}</p>}
             </div>
 
             {/* Neighborhood */}
             <div className="form-group">
-              <label htmlFor="neighborhood" className="block text-sm font-medium text-white mb-2">Barrio / Sector</label>
+              <label htmlFor="neighborhood" className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Barrio / Sector</label>
               <div className="relative">
-                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-eco-green/50" aria-hidden="true" />
+                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--text-muted)' }} aria-hidden="true" />
                 <select
                   id="neighborhood"
                   name="neighborhood"
                   value={formData.neighborhood}
                   onChange={(e) => setFormData(prev => ({ ...prev, neighborhood: e.target.value }))}
-                  onBlur={() => validateForm()}
-                  className={`input-field pl-12 pr-10 py-3.5 appearance-none ${errors.neighborhood ? 'border-red-500/50 focus:border-red-500 focus:ring-red-500/20' : ''}`}
+                  onBlur={validateForm}
+                  className={`input-field pl-12 pr-10 py-3.5 appearance-none ${errors.neighborhood ? 'border-[var(--accent-coral)]/50 focus:border-[var(--accent-coral)] focus:ring-[var(--accent-coral)]/20' : ''}`}
                   aria-invalid={errors.neighborhood ? 'true' : 'false'}
                   aria-describedby={errors.neighborhood ? 'neighborhood-error' : undefined}
                   disabled={isLoading}
@@ -220,26 +225,26 @@ export default function Register() {
                     <option key={n} value={n}>{n}</option>
                   ))}
                 </select>
-                <svg className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-eco-green/50 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <svg className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--text-muted)' }} aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                 </svg>
               </div>
-              {errors.neighborhood && <p id="neighborhood-error" className="mt-1.5 text-sm text-red-400" role="alert">{errors.neighborhood}</p>}
+              {errors.neighborhood && <p id="neighborhood-error" className="mt-1.5 text-sm" role="alert" style={{ color: 'var(--accent-coral)' }}>{errors.neighborhood}</p>}
             </div>
 
             {/* Password */}
             <div className="form-group">
-              <label htmlFor="password" className="block text-sm font-medium text-white mb-2">Contraseña</label>
+              <label htmlFor="password" className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Contraseña</label>
               <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-eco-green/50" aria-hidden="true" />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--text-muted)' }} aria-hidden="true" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   id="password"
                   name="password"
                   value={formData.password}
                   onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                  onBlur={() => validateForm()}
-                  className={`input-field pl-12 pr-12 py-3.5 ${errors.password ? 'border-red-500/50 focus:border-red-500 focus:ring-red-500/20' : ''}`}
+                  onBlur={validateForm}
+                  className={`input-field pl-12 pr-12 py-3.5 ${errors.password ? 'border-[var(--accent-coral)]/50 focus:border-[var(--accent-coral)] focus:ring-[var(--accent-coral)]/20' : ''}`}
                   placeholder="••••••••"
                   aria-invalid={errors.password ? 'true' : 'false'}
                   aria-describedby={errors.password ? 'password-error' : undefined}
@@ -249,14 +254,15 @@ export default function Register() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-eco-green/50 hover:text-eco-neon transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 transition-colors"
+                  style={{ color: 'var(--text-muted)' }}
                   aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                   aria-pressed={showPassword}
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
-              {errors.password && <p id="password-error" className="mt-1.5 text-sm text-red-400" role="alert">{errors.password}</p>}
+              {errors.password && <p id="password-error" className="mt-1.5 text-sm" role="alert" style={{ color: 'var(--accent-coral)' }}>{errors.password}</p>}
 
               {/* Password Strength */}
               {formData.password && (
@@ -265,28 +271,29 @@ export default function Register() {
                     {[1,2,3,4,5].map((level) => (
                       <div
                         key={level}
-                        className={`flex-1 rounded transition-colors ${level <= passwordStrength ? getStrengthColor() : 'bg-eco-border/30'}`}
+                        className="flex-1 rounded transition-colors"
+                        style={{ background: level <= passwordStrength ? getStrengthColor(level) : 'var(--border-default)' }}
                       />
                     ))}
                   </div>
-                  <p className="text-xs text-eco-green/50 mt-1 text-right">{getStrengthLabel()}</p>
+                  <p className="text-xs text-right mt-1" style={{ color: 'var(--text-muted)' }}>{getStrengthLabel()}</p>
                 </div>
               )}
             </div>
 
             {/* Confirm Password */}
             <div className="form-group">
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-white mb-2">Confirmar Contraseña</label>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Confirmar Contraseña</label>
               <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-eco-green/50" aria-hidden="true" />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--text-muted)' }} aria-hidden="true" />
                 <input
                   type={showConfirmPassword ? 'text' : 'password'}
                   id="confirmPassword"
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                  onBlur={() => validateForm()}
-                  className={`input-field pl-12 pr-12 py-3.5 ${errors.confirmPassword ? 'border-red-500/50 focus:border-red-500 focus:ring-red-500/20' : ''}`}
+                  onBlur={validateForm}
+                  className={`input-field pl-12 pr-12 py-3.5 ${errors.confirmPassword ? 'border-[var(--accent-coral)]/50 focus:border-[var(--accent-coral)] focus:ring-[var(--accent-coral)]/20' : ''}`}
                   placeholder="••••••••"
                   aria-invalid={errors.confirmPassword ? 'true' : 'false'}
                   aria-describedby={errors.confirmPassword ? 'confirmPassword-error' : undefined}
@@ -296,14 +303,15 @@ export default function Register() {
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-eco-green/50 hover:text-eco-neon transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 transition-colors"
+                  style={{ color: 'var(--text-muted)' }}
                   aria-label={showConfirmPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                   aria-pressed={showConfirmPassword}
                 >
                   {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
-              {errors.confirmPassword && <p id="confirmPassword-error" className="mt-1.5 text-sm text-red-400" role="alert">{errors.confirmPassword}</p>}
+              {errors.confirmPassword && <p id="confirmPassword-error" className="mt-1.5 text-sm" role="alert" style={{ color: 'var(--accent-coral)' }}>{errors.confirmPassword}</p>}
             </div>
 
             {/* Terms */}
@@ -313,18 +321,19 @@ export default function Register() {
                   type="checkbox"
                   checked={formData.acceptTerms}
                   onChange={(e) => setFormData(prev => ({ ...prev, acceptTerms: e.target.checked }))}
-                  className="w-4 h-4 mt-0.5 accent-eco-neon rounded border-eco-border/50 bg-eco-surface flex-shrink-0"
+                  className="w-4 h-4 mt-0.5 rounded border flex-shrink-0"
+                  style={{ accentColor: 'var(--accent)', borderColor: 'var(--border-default)', backgroundColor: 'var(--bg-surface)' }}
                   aria-invalid={errors.acceptTerms ? 'true' : 'false'}
                   aria-describedby={errors.acceptTerms ? 'terms-error' : undefined}
                   disabled={isLoading}
                 />
-                <div className="text-sm text-eco-green/70 leading-relaxed">
-                  Acepto los <NavLink to="/terms" className="text-eco-neon hover:text-eco-green underline">Términos y Condiciones</NavLink> y la
-                  <NavLink to="/privacy" className="text-eco-neon hover:text-eco-green underline">Política de Privacidad</NavLink>.
+                <div className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                  Acepto los <NavLink to="/terms" className="font-medium underline transition-colors" style={{ color: 'var(--accent)' }}>Términos y Condiciones</NavLink> y la
+                  <NavLink to="/privacy" className="font-medium underline transition-colors" style={{ color: 'var(--accent)' }}>Política de Privacidad</NavLink>.
                   Autorizo el tratamiento de mis datos para la gestión de residuos según la Ley 1581/2012.
                 </div>
               </label>
-              {errors.acceptTerms && <p id="terms-error" className="mt-1.5 text-sm text-red-400 ml-7" role="alert">{errors.acceptTerms}</p>}
+              {errors.acceptTerms && <p id="terms-error" className="mt-1.5 text-sm ml-7" role="alert" style={{ color: 'var(--accent-coral)' }}>{errors.acceptTerms}</p>}
             </div>
 
             {/* Submit */}
@@ -352,9 +361,9 @@ export default function Register() {
 
           {/* Footer */}
           <div className="register-footer text-center mt-6">
-            <p className="text-eco-green/60 text-sm">
+            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
               ¿Ya tienes cuenta?{' '}
-              <NavLink to="/login" className="text-eco-neon hover:text-eco-green font-medium transition-colors">
+              <NavLink to="/login" className="font-medium transition-colors" style={{ color: 'var(--accent)' }}>
                 Inicia sesión
               </NavLink>
             </p>
@@ -362,22 +371,22 @@ export default function Register() {
         </div>
 
         {/* Benefits */}
-        <div className="mt-6 glass-panel rounded-2xl p-6 animate-in">
-          <h3 className="font-semibold text-white text-center mb-4 flex items-center justify-center gap-2">
-            <Shield className="w-5 h-5 text-eco-neon" aria-hidden="true" />
+        <div className="mt-8 surface-panel rounded-2xl p-6">
+          <h3 className="font-semibold text-center mb-4 flex items-center justify-center gap-2" style={{ color: 'var(--text-primary)' }}>
+            <Shield className="w-5 h-5" style={{ color: 'var(--accent)' }} aria-hidden="true" />
             Lo que obtienes al registrarte
           </h3>
-          <div className="grid grid-cols-2 gap-4 text-sm">
+          <div className="benefits-grid grid grid-cols-2 gap-4 text-sm">
             {[
               { icon: Truck, title: 'Rutas en Vivo', desc: 'Camiones en tiempo real' },
               { icon: MapPin, title: 'Puntos Limpios', desc: 'Cercanos a tu barrio' },
               { icon: Award, title: 'EcoPuntos', desc: 'Canjeables por premios' },
               { icon: Recycle, title: 'Guía Oficial', desc: 'Resolución 2184/2019' },
             ].map((benefit, i) => (
-              <div key={i} className="p-3 rounded-lg bg-eco-surface/50 border border-eco-border/30 text-center">
-                <benefit.icon className="w-6 h-6 text-eco-neon mx-auto mb-2" aria-hidden="true" />
-                <p className="font-medium text-white">{benefit.title}</p>
-                <p className="text-xs text-eco-green/60 mt-0.5">{benefit.desc}</p>
+              <div key={i} className="p-3 rounded-lg border text-center" style={{ background: 'var(--bg-elevated)/50', borderColor: 'var(--border-subtle)' }}>
+                <benefit.icon className="w-6 h-6 mx-auto mb-2" style={{ color: 'var(--accent)' }} aria-hidden="true" />
+                <p className="font-medium" style={{ color: 'var(--text-primary)' }}>{benefit.title}</p>
+                <p className="text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>{benefit.desc}</p>
               </div>
             ))}
           </div>

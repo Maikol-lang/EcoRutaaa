@@ -21,6 +21,30 @@
         "rule": "overused-font",
         "value": "space grotesk pre-existing design system choice, not introduced in this session",
         "createdAt": "2026-11-17T00:11:17.655Z"
+      },
+      {
+        "rule": "overused-font",
+        "value": "fraunces",
+        "createdAt": "2026-11-17T19:16:33.465Z",
+        "reason": "Intentional design system choice per DESIGN.md: Fraunces selected for editorial display personality, paired with DM Sans for UI. Not an AI default."
+      },
+      {
+        "rule": "ai-color-palette",
+        "value": "*",
+        "files": [
+          "src/index.css"
+        ],
+        "createdAt": "2026-11-17T19:16:47.803Z",
+        "reason": "Intentional accent in design system: violet used sparingly only for .badge-premium and .text-gradient-premium utility classes (premium features), not as general UI palette. Core palette is ivory/stone/charcoal/sage/forest/sky/amber/coral per DESIGN.md."
+      },
+      {
+        "rule": "gradient-text",
+        "value": "*",
+        "files": [
+          "C:/Users/admin/Claude-Proyectos/EcoRuta/src/components/Hero.jsx"
+        ],
+        "createdAt": "2026-11-22T20:05:42.440Z",
+        "reason": "Intentional editorial design choice: gradient accent on 'de Residuos' for visual hierarchy in asymmetric hero layout, matching SaaS/Smart City brief"
       }
     ]
   }

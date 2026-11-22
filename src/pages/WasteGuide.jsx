@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { gsap } from 'gsap';
+import { useGSAP } from '@gsap/react';
+import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Search, ChevronDown, ChevronUp, CheckCircle, XCircle, Info, AlertTriangle, Leaf, Recycle, Trash2, Droplet, Battery, Cpu, Building, Truck, Sparkles } from 'lucide-react';
 import { wasteCategories, specialWaste } from '../data/wasteClassification';
+import { useTheme } from '../context/ThemeContext';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -13,7 +15,6 @@ const searchItems = wasteCategories.flatMap(cat =>
     item: ex.item,
     details: ex.details,
     color: cat.color,
-    textColor: cat.textColor,
   }))
 ).concat(specialWaste.flatMap(sw =>
   sw.items.map(item => ({
@@ -21,16 +22,41 @@ const searchItems = wasteCategories.flatMap(cat =>
     categoryName: sw.category,
     item,
     details: `Eliminar en: ${sw.disposal}`,
-    color: '#F59E0B',
-    textColor: '#FFFFFF',
+    color: 'amber',
   }))
 ));
 
+const categoryIcons = {
+  white: Recycle,
+  green: Leaf,
+  black: Trash2,
+  special: AlertTriangle,
+};
+
+const categoryAccent = {
+  white: 'forest',
+  green: 'forest',
+  black: 'stone',
+  special: 'amber',
+};
+
+const allCategories = [
+  { id: 'all', label: 'Todos', icon: Sparkles, accent: 'stone' },
+  { id: 'white', label: 'Blanco', icon: Recycle, accent: 'forest' },
+  { id: 'green', label: 'Verde', icon: Leaf, accent: 'forest' },
+  { id: 'black', label: 'Negro', icon: Trash2, accent: 'stone' },
+  { id: 'special', label: 'Especiales', icon: AlertTriangle, accent: 'amber' },
+];
+
 export default function WasteGuide() {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedItems, setExpandedItems] = useState(new Set());
   const containerRef = useRef(null);
+  const categoryBtnsRef = useRef(null);
+  const cardsRef = useRef(null);
 
   const filteredItems = useMemo(() => {
     return searchItems.filter(item => {
@@ -41,45 +67,28 @@ export default function WasteGuide() {
     });
   }, [searchQuery, activeCategory]);
 
-  const categories = [
-    { id: 'all', label: 'Todos', icon: Sparkles },
-    { id: 'white', label: 'Blanco', icon: Recycle, color: 'bg-white/10 border-white/20 text-white' },
-    { id: 'green', label: 'Verde', icon: Leaf, color: 'bg-eco-green/10 border-eco-green/20 text-eco-green' },
-    { id: 'black', label: 'Negro', icon: Trash2, color: 'bg-gray-900/50 border-gray-700/30 text-gray-300' },
-    { id: 'special', label: 'Especiales', icon: AlertTriangle, color: 'bg-amber-500/10 border-amber-500/20 text-amber-400' },
-  ];
+  // GSAP Animations
+  useGSAP(() => {
+    // Category buttons entrance
+    const categoryBtns = categoryBtnsRef.current?.querySelectorAll('.category-btn');
+    if (categoryBtns?.length) {
+      gsap.fromTo(categoryBtns,
+        { y: 16, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.4, ease: 'var(--ease-out)', stagger: 0.05 }
+      );
+    }
 
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      const categoryBtns = containerRef.current?.querySelectorAll('.category-btn');
-      const wasteCards = containerRef.current?.querySelectorAll('.waste-card');
-      const specialCards = containerRef.current?.querySelectorAll('.special-card');
-
-      if (categoryBtns?.length) {
-        gsap.fromTo(categoryBtns,
-          { y: 20, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.4, ease: 'power3.out', stagger: 0.05 }
-        );
-      }
-      if (wasteCards?.length) {
-        gsap.fromTo(wasteCards,
-          { y: 30, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.5, ease: 'power3.out', stagger: 0.05,
-            scrollTrigger: { trigger: containerRef.current, start: 'top 85%' }
-          }
-        );
-      }
-      if (specialCards?.length) {
-        gsap.fromTo(specialCards,
-          { y: 30, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.5, ease: 'power3.out', stagger: 0.08,
-            scrollTrigger: { trigger: containerRef.current, start: 'top 85%' }
-          }
-        );
-      }
-    }, containerRef);
-    return () => ctx.revert();
-  }, [activeCategory, searchQuery]);
+    // Waste cards entrance
+    const wasteCards = cardsRef.current?.querySelectorAll('.waste-card');
+    if (wasteCards?.length) {
+      gsap.fromTo(wasteCards,
+        { y: 24, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.5, ease: 'var(--ease-out)', stagger: 0.05,
+          scrollTrigger: { trigger: containerRef.current, start: 'top 85%' }
+        }
+      );
+    }
+  }, { scope: containerRef, dependencies: [activeCategory, searchQuery] });
 
   const toggleExpanded = (item) => {
     setExpandedItems(prev => {
@@ -90,26 +99,36 @@ export default function WasteGuide() {
     });
   };
 
+  const getCategoryCardStyle = (accent, isActive, isDark) => {
+    if (isActive) {
+      return 'bg-[var(--bg-elevated)] border-[var(--border-default)] shadow-sm';
+    }
+    return isDark
+      ? 'bg-[var(--bg-surface)]/50 border-[var(--border-subtle)] hover:bg-[var(--bg-elevated)]/50 hover:border-[var(--border-default)]'
+      : 'bg-[var(--bg-surface)] border-[var(--border-subtle)] hover:bg-[var(--bg-elevated)] hover:border-[var(--border-default)]';
+  };
+
   return (
-    <div className="min-h-screen pb-16">
-      {/* Header */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="glow-orb-neon w-96 h-96 top-0 right-0 translate-x-1/2 -translate-y-1/2" aria-hidden="true" />
-          <div className="glow-orb-green w-72 h-72 bottom-0 left-0 -translate-x-1/2 translate-y-1/2" aria-hidden="true" />
+    <div ref={containerRef} className="min-h-screen pb-16 bg-[var(--bg-canvas)]">
+      {/* Header - Editorial style */}
+      <section className="relative overflow-hidden" style={{ background: 'var(--bg-elevated)' }}>
+        <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+          <div className="absolute top-1/4 left-1/6 w-96 h-96 rounded-full bg-[var(--accent)]/10 blur-3xl" />
+          <div className="absolute bottom-1/4 right-1/6 w-72 h-72 rounded-full bg-[var(--accent-amber)]/10 blur-3xl" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[var(--accent)]/5 blur-3xl" />
         </div>
         <div className="section-container relative z-10 pt-8 pb-12 lg:pt-16 lg:pb-20">
           <div className="max-w-7xl mx-auto text-center">
-            <p className="text-eco-green/60 text-sm font-medium uppercase tracking-wider mb-2">Guía Oficial</p>
-            <h1 className="font-display font-bold text-3xl sm:text-4xl lg:text-5xl text-white mb-4">
+            <p className="text-sm font-medium uppercase tracking-wider mb-2" style={{ color: 'var(--accent)' }}>Guía Oficial</p>
+            <h1 className="font-display font-bold text-display-md lg:text-display-lg mb-4" style={{ color: 'var(--text-primary)' }}>
               Clasificación de Residuos
               <br />
               <span className="gradient-text">Resolución 2184/2019</span>
             </h1>
-            <p className="text-eco-green/60 max-w-2xl mx-auto text-lg">
-              Separa correctamente: Contenedor <span className="font-semibold text-white">Blanco</span> (Aprovechables),
-              <span className="font-semibold text-eco-green">Verde</span> (Orgánicos) y
-              <span className="font-semibold text-gray-300">Negro</span> (No Aprovechables).
+            <p className="text-lg max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
+              Separa correctamente: Contenedor <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>Blanco</span> (Aprovechables),
+              <span className="font-semibold" style={{ color: 'var(--accent)' }}>Verde</span> (Orgánicos) y
+              <span className="font-semibold" style={{ color: 'var(--text-secondary)' }}>Negro</span> (No Aprovechables).
             </p>
           </div>
         </div>
@@ -118,9 +137,9 @@ export default function WasteGuide() {
       {/* Search & Filters */}
       <section className="section-container -mt-6 lg:-mt-8 pb-8 relative z-10">
         <div className="max-w-5xl mx-auto">
-          <div className="glass-panel rounded-2xl p-4 lg:p-6 mb-6">
+          <div className="surface-panel rounded-2xl p-4 lg:p-6 mb-6">
             <div className="relative mb-4">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-eco-green/50" aria-hidden="true" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--text-muted)' }} aria-hidden="true" />
               <input
                 type="search"
                 placeholder="Busca qué va en cada contenedor... (ej: pilas, aceite, tetrapak, cáscaras)"
@@ -130,21 +149,20 @@ export default function WasteGuide() {
                 aria-label="Buscar residuos"
               />
             </div>
-            <div className="flex flex-wrap gap-2">
-              {categories.map((cat) => (
-                <button
-                  key={cat.id}
-                  onClick={() => { setActiveCategory(cat.id); setSearchQuery(''); }}
-                  className={`category-btn flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 border ${
-                    activeCategory === cat.id
-                      ? `bg-${cat.id === 'white' ? 'white/10' : cat.id === 'green' ? 'eco-green/10' : cat.id === 'black' ? 'gray-900/50' : 'amber-500/10'} border-current text-current shadow-lg shadow-current/20`
-                      : cat.color + ' text-eco-green/60 hover:text-white hover:border-current/50'
-                  }`}
-                >
-                  <cat.icon className="w-4 h-4" aria-hidden="true" />
-                  {cat.label}
-                </button>
-              ))}
+            <div ref={categoryBtnsRef} className="flex flex-wrap gap-2">
+              {allCategories.map((cat) => {
+                const isActive = activeCategory === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => { setActiveCategory(cat.id); setSearchQuery(''); }}
+                    className={`category-btn flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-[120ms] ease-[var(--ease-out)] border ${getCategoryCardStyle(cat.accent, isActive, isDark)}`}
+                  >
+                    <cat.icon className={`w-4 h-4 ${isActive ? 'text-[var(--accent)]' : 'text-[var(--text-muted)]'}`} aria-hidden="true" />
+                    {cat.label}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -153,33 +171,33 @@ export default function WasteGuide() {
       {/* Main Content */}
       <section className="section-container pb-16 relative z-10">
         <div className="max-w-5xl mx-auto">
-          {/* Three Main Containers */}
-          {activeCategory === 'all' && (
-            <div ref={containerRef} className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+          {/* Three Main Containers - Overview Grid */}
+          {activeCategory === 'all' && !searchQuery && (
+            <div ref={cardsRef} className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
               {['white', 'green', 'black'].map((catId) => {
                 const cat = wasteCategories.find(c => c.id === catId);
-                const Icon = catId === 'white' ? Recycle : catId === 'green' ? Leaf : Trash2;
+                const Icon = categoryIcons[catId];
+                const accent = categoryAccent[catId];
                 return (
-                  <div key={catId} className={`waste-card card p-6 relative overflow-hidden group ${catId === 'white' ? 'border-white/20' : catId === 'green' ? 'border-eco-green/20' : 'border-gray-700/30'}`}>
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-current/5 rounded-full blur-2xl opacity-20" style={{ '--current': cat.color }} aria-hidden="true" />
+                  <div key={catId} className="waste-card card-interactive card-padded relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-32 h-32 rounded-full opacity-10 blur-2xl" style={{ background: 'var(--accent)' }} aria-hidden="true" />
                     <div className="relative z-10">
-                      <div className={`flex items-center gap-3 mb-4 w-14 h-14 rounded-xl flex items-center justify-center ${catId === 'white' ? 'bg-white/10 border-white/20' : catId === 'green' ? 'bg-eco-green/10 border-eco-green/20' : 'bg-gray-900/50 border-gray-700/30'}`}>
-                        <Icon className="w-7 h-7" style={{ color: cat.color }} aria-hidden="true" />
+                      <div className="w-13 h-13 rounded-xl flex items-center justify-center mb-4 bg-[var(--bg-elevated)] border border-[var(--border-subtle)] group-hover:scale-105 transition-transform duration-200">
+                        <Icon className="w-7 h-7" style={{ color: 'var(--accent)' }} aria-hidden="true" />
                       </div>
-                      <h3 className="font-display font-bold text-xl text-white mb-1">{cat.name}</h3>
-                      <p className="text-sm" style={{ color: cat.textColor }} opacity={0.7}>{cat.subtitle}</p>
-                      <p className="text-eco-green/50 text-sm mt-4">{cat.description}</p>
-                      <div className="mt-6 pt-4 border-t border-current/20 space-y-3" style={{ '--current': cat.color }}>
+                      <h3 className="font-display font-bold text-h4 mb-1" style={{ color: 'var(--text-primary)' }}>{cat.name}</h3>
+                      <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>{cat.subtitle}</p>
+                      <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>{cat.description}</p>
+                      <div className="mt-4 pt-4 border-t space-y-3" style={{ borderColor: 'var(--border-subtle)' }}>
                         {cat.examples.slice(0, 3).map((ex) => (
-                          <div key={ex.item} className="flex items-center gap-2 text-sm">
-                            <CheckCircle className="w-4 h-4 flex-shrink-0" style={{ color: cat.color }} aria-hidden="true" />
-                            <span style={{ color: cat.textColor }}>{ex.item}</span>
+                          <div key={ex.item} className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                            <CheckCircle className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--accent)' }} aria-hidden="true" />
+                            <span>{ex.item}</span>
                           </div>
                         ))}
                         <button
                           onClick={() => setActiveCategory(catId)}
-                          className="w-full mt-2 flex items-center justify-center gap-2 text-sm font-medium transition-colors"
-                          style={{ color: cat.color }}
+                          className="w-full mt-2 flex items-center justify-center gap-2 text-sm font-medium transition-colors" style={{ color: 'var(--accent)' }}
                         >
                           Ver todo <ChevronDown className="w-4 h-4" aria-hidden="true" />
                         </button>
@@ -192,10 +210,10 @@ export default function WasteGuide() {
           )}
 
           {/* Detailed Category View */}
-          {activeCategory !== 'all' && activeCategory !== 'special' && (
-            <div ref={containerRef} className="space-y-4">
+          {activeCategory !== 'all' && activeCategory !== 'special' && !searchQuery && (
+            <div ref={cardsRef} className="space-y-4">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="font-display font-semibold text-xl text-white">
+                <h2 className="font-display font-semibold text-h3" style={{ color: 'var(--text-primary)' }}>
                   {wasteCategories.find(c => c.id === activeCategory)?.name} - Detalle completo
                 </h2>
                 <button onClick={() => setActiveCategory('all')} className="btn-ghost text-sm">Ver todos</button>
@@ -211,36 +229,37 @@ export default function WasteGuide() {
                   onToggle={() => toggleExpanded(ex.item)}
                   tips={wasteCategories.find(c => c.id === activeCategory)?.tips}
                   stats={wasteCategories.find(c => c.id === activeCategory)?.stats}
+                  isDark={isDark}
                 />
               ))}
             </div>
           )}
 
           {/* Special Waste */}
-          {activeCategory === 'special' && (
-            <div ref={containerRef} className="space-y-4">
-              <h2 className="font-display font-semibold text-xl text-white mb-4">Residuos Especiales y Peligrosos</h2>
-              <p className="text-eco-green/60 mb-6">Estos residuos <strong className="text-amber-400">NUNCA</strong> van en los contenedores comunes. Llévalos a Puntos Limpios.</p>
+          {activeCategory === 'special' && !searchQuery && (
+            <div ref={cardsRef} className="space-y-4">
+              <h2 className="font-display font-semibold text-h3 mb-4" style={{ color: 'var(--text-primary)' }}>Residuos Especiales y Peligrosos</h2>
+              <p className="mb-6" style={{ color: 'var(--text-secondary)' }}>Estos residuos <strong style={{ color: 'var(--accent-amber)' }}>NUNCA</strong> van en los contenedores comunes. Llévalos a Puntos Limpios.</p>
               {specialWaste.map((sw, i) => (
-                <SpecialWasteCard key={sw.category} data={sw} index={i} />
+                <SpecialWasteCard key={sw.category} data={sw} index={i} isDark={isDark} />
               ))}
             </div>
           )}
 
           {/* Search Results */}
-          {searchQuery && activeCategory === 'all' && (
-            <div ref={containerRef} className="space-y-4">
-              <h2 className="font-display font-semibold text-xl text-white mb-4">
+          {searchQuery && (
+            <div ref={cardsRef} className="space-y-4">
+              <h2 className="font-display font-semibold text-h3 mb-4" style={{ color: 'var(--text-primary)' }}>
                 Resultados para "{searchQuery}" ({filteredItems.length})
               </h2>
               {filteredItems.length === 0 ? (
-                <div className="card p-8 text-center">
-                  <Search className="w-12 h-12 text-eco-green/30 mx-auto mb-4" aria-hidden="true" />
-                  <p className="text-eco-green/50">No se encontraron resultados. Intenta con otros términos.</p>
+                <div className="card-padded text-center py-12">
+                  <Search className="w-10 h-10 mx-auto mb-4" style={{ color: 'var(--text-muted)' }} aria-hidden="true" />
+                  <p style={{ color: 'var(--text-secondary)' }}>No se encontraron resultados. Intenta con otros términos.</p>
                 </div>
               ) : (
                 filteredItems.map((item, i) => (
-                  <SearchResultCard key={`${item.category}-${item.item}-${i}`} item={item} index={i} />
+                  <SearchResultCard key={`${item.category}-${item.item}-${i}`} item={item} index={i} isDark={isDark} />
                 ))
               )}
             </div>
@@ -249,21 +268,21 @@ export default function WasteGuide() {
       </section>
 
       {/* Key Principles */}
-      <section className="section-container pb-16 relative z-10 bg-eco-bg-light/50">
+      <section className="section-container pb-16 relative z-10" style={{ background: 'var(--bg-elevated)' }}>
         <div className="max-w-5xl mx-auto">
-          <h2 className="font-display font-semibold text-xl text-white text-center mb-10">Principios clave de la separación</h2>
+          <h2 className="font-display font-semibold text-h3 text-center mb-10" style={{ color: 'var(--text-primary)' }}>Principios clave de la separación</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { icon: Sparkles, title: 'Limpio y Seco', desc: 'Lava y seca envases antes de depositarlos. Los residuos sucios contaminan el reciclaje.', color: 'eco-neon' },
-              { icon: Leaf, title: 'Orgánico Separado', desc: 'Los orgánicos en verde generan compost. Mezclados en negro generan metano (25x más CO₂).', color: 'eco-green' },
-              { icon: AlertTriangle, title: 'Peligrosos Separados', desc: 'Pilas, aceites, medicamentos y electrónicos dañan suelos y aguas. Solo Puntos Limpios.', color: 'eco-cyan' },
+              { icon: Sparkles, title: 'Limpio y Seco', desc: 'Lava y seca envases antes de depositarlos. Los residuos sucios contaminan el reciclaje.', accent: 'forest' },
+              { icon: Leaf, title: 'Orgánico Separado', desc: 'Los orgánicos en verde generan compost. Mezclados en negro generan metano (25x más CO₂).', accent: 'forest' },
+              { icon: AlertTriangle, title: 'Peligrosos Separados', desc: 'Pilas, aceites, medicamentos y electrónicos dañan suelos y aguas. Solo Puntos Limpios.', accent: 'sky' },
             ].map((principle, i) => (
-              <div key={i} className="card p-6">
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4`} style={{ background: `var(--${principle.color})20`, borderColor: `var(--${principle.color})40` }}>
-                  <principle.icon className="w-6 h-6" style={{ color: `var(--${principle.color})` }} aria-hidden="true" />
+              <div key={i} className="card-interactive card-padded">
+                <div className="w-11 h-11 rounded-lg flex items-center justify-center mb-4 bg-[var(--bg-elevated)] border border-[var(--border-subtle)]">
+                  <principle.icon className="w-5 h-5" style={{ color: 'var(--accent)' }} aria-hidden="true" />
                 </div>
-                <h3 className="font-semibold text-white mb-2">{principle.title}</h3>
-                <p className="text-eco-green/60 text-sm">{principle.desc}</p>
+                <h3 className="font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>{principle.title}</h3>
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{principle.desc}</p>
               </div>
             ))}
           </div>
@@ -273,53 +292,53 @@ export default function WasteGuide() {
   );
 }
 
-function WasteItemCard({ item, details, category, index, isExpanded, onToggle, tips, stats }) {
-  const cat = wasteCategories.find(c => c.id === category);
-  const Icon = category === 'white' ? Recycle : category === 'green' ? Leaf : Trash2;
+function WasteItemCard({ item, details, category, index, isExpanded, onToggle, tips, stats, isDark }) {
+  const accent = categoryAccent[category];
+  const Icon = categoryIcons[category];
 
   return (
-    <div className={`card overflow-hidden ${category === 'white' ? 'border-white/10' : category === 'green' ? 'border-eco-green/10' : 'border-gray-700/20'}`}>
+    <div className="card-interactive overflow-hidden border" style={{ borderColor: 'var(--border-subtle)' }}>
       <button
         onClick={onToggle}
         className="w-full p-5 flex items-center gap-4 text-left"
         aria-expanded={isExpanded}
       >
-        <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${category === 'white' ? 'bg-white/10 border-white/20' : category === 'green' ? 'bg-eco-green/10 border-eco-green/20' : 'bg-gray-900/50 border-gray-700/30'}`}>
-          <Icon className="w-6 h-6" style={{ color: cat?.color }} aria-hidden="true" />
+        <div className="w-11 h-11 rounded-lg flex items-center justify-center flex-shrink-0 bg-[var(--bg-elevated)] border border-[var(--border-subtle)]">
+          <Icon className="w-5 h-5" style={{ color: 'var(--accent)' }} aria-hidden="true" />
         </div>
         <div className="flex-1">
-          <h3 className="font-semibold text-white">{item}</h3>
-          <p className="text-sm text-eco-green/60">{details}</p>
+          <h3 className="font-semibold" style={{ color: 'var(--text-primary)' }}>{item}</h3>
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{details}</p>
         </div>
-        <ChevronDown className={`w-5 h-5 text-eco-green/50 transition-transform ${isExpanded ? 'rotate-180' : ''}`} aria-hidden="true" />
+        <ChevronDown className="w-5 h-5 transition-transform duration-200" style={{ color: 'var(--text-muted)' }} aria-hidden="true" />
       </button>
       {isExpanded && (
-        <div className="px-5 pb-5 border-t border-current/10 animate-in" style={{ '--current': cat?.color }}>
+        <div className="px-5 pb-5 border-t animate-in" style={{ borderColor: 'var(--border-subtle)' }}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
             <div>
-              <h4 className="font-medium text-eco-neon text-sm mb-3 flex items-center gap-1">
+              <h4 className="font-medium text-sm mb-3 flex items-center gap-1" style={{ color: 'var(--accent)' }}>
                 <Info className="w-4 h-4" aria-hidden="true" />
                 Tips clave
               </h4>
-              <ul className="space-y-2 text-sm text-eco-green/70">
+              <ul className="space-y-2 text-sm">
                 {tips?.map((tip, i) => (
                   <li key={i} className="flex items-start gap-2">
-                    <CheckCircle className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: cat?.color }} aria-hidden="true" />
-                    <span>{tip}</span>
+                    <CheckCircle className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: 'var(--accent)' }} aria-hidden="true" />
+                    <span style={{ color: 'var(--text-secondary)' }}>{tip}</span>
                   </li>
                 ))}
               </ul>
             </div>
             <div>
-              <h4 className="font-medium text-eco-neon text-sm mb-3 flex items-center gap-1">
+              <h4 className="font-medium text-sm mb-3 flex items-center gap-1" style={{ color: 'var(--accent)' }}>
                 <Sparkles className="w-4 h-4" aria-hidden="true" />
                 Impacto ambiental
               </h4>
-              <div className="space-y-2 text-sm text-eco-green/70">
+              <div className="space-y-2 text-sm">
                 {stats && Object.entries(stats).map(([key, value]) => (
                   <div key={key} className="flex justify-between">
-                    <span>{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</span>
-                    <span className="font-medium" style={{ color: cat?.color }}>{value}</span>
+                    <span style={{ color: 'var(--text-secondary)' }}>{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</span>
+                    <span className="font-medium" style={{ color: 'var(--accent)' }}>{value}</span>
                   </div>
                 ))}
               </div>
@@ -331,24 +350,24 @@ function WasteItemCard({ item, details, category, index, isExpanded, onToggle, t
   );
 }
 
-function SpecialWasteCard({ data, index }) {
+function SpecialWasteCard({ data, index, isDark }) {
   const icons = { 'alert-triangle': AlertTriangle, 'cpu': Cpu, 'building': Building, 'droplet': Droplet, 'battery': Battery };
   const Icon = icons[data.icon] || AlertTriangle;
 
   return (
-    <div className="special-card card p-5 border-amber-500/20 bg-amber-500/5">
+    <div className="special-card card-interactive card-padded border" style={{ borderColor: 'var(--border-subtle)' }}>
       <div className="flex items-start gap-4">
-        <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center flex-shrink-0">
-          <Icon className="w-6 h-6 text-amber-400" aria-hidden="true" />
+        <div className="w-11 h-11 rounded-lg flex items-center justify-center flex-shrink-0 bg-[var(--bg-elevated)] border border-[var(--border-subtle)]">
+          <Icon className="w-5 h-5" style={{ color: 'var(--accent-amber)' }} aria-hidden="true" />
         </div>
         <div className="flex-1">
-          <h3 className="font-semibold text-white mb-1">{data.category}</h3>
+          <h3 className="font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>{data.category}</h3>
           <div className="flex flex-wrap gap-2 mb-3">
             {data.items.map((item) => (
-              <span key={item} className="px-2 py-1 text-xs rounded bg-amber-500/10 border border-amber-500/20 text-amber-300">{item}</span>
+              <span key={item} className="px-2.5 py-1 text-xs rounded border" style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-subtle)', color: 'var(--accent-amber)' }}>{item}</span>
             ))}
           </div>
-          <p className="text-sm text-amber-300 flex items-center gap-1">
+          <p className="text-sm flex items-center gap-1" style={{ color: 'var(--text-secondary)' }}>
             <Info className="w-3.5 h-3.5" aria-hidden="true" />
             {data.disposal}
           </p>
@@ -358,23 +377,23 @@ function SpecialWasteCard({ data, index }) {
   );
 }
 
-function SearchResultCard({ item, index }) {
-  const cat = wasteCategories.find(c => c.id === item.category);
-  const Icon = item.category === 'white' ? Recycle : item.category === 'green' ? Leaf : item.category === 'black' ? Trash2 : AlertTriangle;
+function SearchResultCard({ item, index, isDark }) {
+  const Icon = categoryIcons[item.category] || AlertTriangle;
+  const accent = categoryAccent[item.category] || 'amber';
 
   return (
-    <div className="card p-4 flex items-center gap-4 animate-in stagger-1">
-      <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${item.category === 'white' ? 'bg-white/10 border-white/20' : item.category === 'green' ? 'bg-eco-green/10 border-eco-green/20' : item.category === 'black' ? 'bg-gray-900/50 border-gray-700/30' : 'bg-amber-500/10 border-amber-500/20'}`}>
-        <Icon className="w-5 h-5" style={{ color: item.color }} aria-hidden="true" />
+    <div className="card-padded flex items-center gap-4 animate-in stagger-1 border" style={{ borderColor: 'var(--border-subtle)' }}>
+      <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 bg-[var(--bg-elevated)] border border-[var(--border-subtle)]">
+        <Icon className="w-4.5 h-4.5" style={{ color: accent === 'forest' ? 'var(--accent)' : accent === 'stone' ? 'var(--text-secondary)' : 'var(--accent-amber)' }} aria-hidden="true" />
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <h4 className="font-medium text-white truncate">{item.item}</h4>
-          <span className={`badge text-xs`} style={{ backgroundColor: `${item.color}20`, borderColor: `${item.color}40`, color: item.textColor }}>
+          <h4 className="font-medium truncate" style={{ color: 'var(--text-primary)' }}>{item.item}</h4>
+          <span className="badge text-xs" style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-subtle)', color: accent === 'forest' ? 'var(--accent)' : accent === 'stone' ? 'var(--text-secondary)' : 'var(--accent-amber)' }}>
             {item.categoryName}
           </span>
         </div>
-        <p className="text-sm text-eco-green/60 truncate">{item.details}</p>
+        <p className="text-sm truncate" style={{ color: 'var(--text-secondary)' }}>{item.details}</p>
       </div>
     </div>
   );

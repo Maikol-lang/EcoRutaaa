@@ -1,13 +1,17 @@
-import { useState, useEffect, useRef } from 'react';
-import { gsap } from 'gsap';
+import { useState, useRef } from 'react';
+import { useGSAP } from '@gsap/react';
+import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Leaf, Eye, EyeOff, Mail, Lock, User, Truck, MapPin, Award, Recycle, ArrowRight, CheckCircle } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Login() {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const { login } = useAuth();
   const navigate = useNavigate();
   const containerRef = useRef(null);
@@ -16,32 +20,30 @@ export default function Login() {
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      const loginCard = containerRef.current?.querySelector('.login-card');
-      const headerItems = containerRef.current?.querySelectorAll('.login-header > *');
-      const formGroups = containerRef.current?.querySelectorAll('.form-group');
-      const loginFooter = containerRef.current?.querySelector('.login-footer');
-      const benefitItems = containerRef.current?.querySelectorAll('.benefits-list li');
+  // GSAP Animations with useGSAP
+  useGSAP(() => {
+    const loginCard = containerRef.current?.querySelector('.login-card');
+    const headerItems = containerRef.current?.querySelectorAll('.login-header > *');
+    const formGroups = containerRef.current?.querySelectorAll('.form-group');
+    const loginFooter = containerRef.current?.querySelector('.login-footer');
+    const benefitItems = containerRef.current?.querySelectorAll('.benefits-list li');
 
-      if (loginCard) {
-        gsap.fromTo(loginCard, { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out' });
-      }
-      if (headerItems?.length) {
-        gsap.fromTo(headerItems, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: 'power3.out', stagger: 0.1, delay: 0.1 });
-      }
-      if (formGroups?.length) {
-        gsap.fromTo(formGroups, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: 'power3.out', stagger: 0.08, delay: 0.2 });
-      }
-      if (loginFooter) {
-        gsap.fromTo(loginFooter, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: 'power3.out', delay: 0.4 });
-      }
-      if (benefitItems?.length) {
-        gsap.fromTo(benefitItems, { x: -20, opacity: 0 }, { x: 0, opacity: 1, duration: 0.4, ease: 'power3.out', stagger: 0.06, delay: 0.5 });
-      }
-    }, containerRef);
-    return () => ctx.revert();
-  }, []);
+    if (loginCard) {
+      gsap.fromTo(loginCard, { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: 'var(--ease-out)' });
+    }
+    if (headerItems?.length) {
+      gsap.fromTo(headerItems, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: 'var(--ease-out)', stagger: 0.1, delay: 0.1 });
+    }
+    if (formGroups?.length) {
+      gsap.fromTo(formGroups, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: 'var(--ease-out)', stagger: 0.08, delay: 0.2 });
+    }
+    if (loginFooter) {
+      gsap.fromTo(loginFooter, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: 'var(--ease-out)', delay: 0.4 });
+    }
+    if (benefitItems?.length) {
+      gsap.fromTo(benefitItems, { x: -20, opacity: 0 }, { x: 0, opacity: 1, duration: 0.4, ease: 'var(--ease-out)', stagger: 0.06, delay: 0.5 });
+    }
+  }, { scope: containerRef });
 
   const validateForm = () => {
     const newErrors = {};
@@ -76,38 +78,37 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-eco-bg relative overflow-hidden p-4" ref={containerRef}>
-      {/* Background orbs */}
+    <div className="min-h-screen flex items-center justify-center bg-[var(--bg-canvas)] relative overflow-hidden p-4" ref={containerRef}>
+      {/* Background orbs - editorial personality */}
       <div className="absolute inset-0" aria-hidden="true">
-        <div className="glow-orb-neon w-96 h-96 top-0 right-0 translate-x-1/2 -translate-y-1/2" />
-        <div className="glow-orb-green w-72 h-72 bottom-0 left-0 -translate-x-1/2 translate-y-1/2" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full blur-3xl" style={{ background: 'var(--accent)/0.1' }} />
       </div>
 
       <div className="relative z-10 w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <NavLink to="/" className="inline-flex items-center gap-2 text-eco-neon" aria-label="EcoRuta - Inicio">
+          <NavLink to="/" className="inline-flex items-center gap-2" style={{ color: 'var(--accent)' }} aria-label="EcoRuta - Inicio">
             <div className="relative">
               <svg className="w-10 h-10" viewBox="0 0 32 32" fill="none" aria-hidden="true">
                 <circle cx="16" cy="16" r="14" stroke="currentColor" strokeWidth="2"/>
                 <path d="M16 6V16L22 20" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M10 18C10 18 14 14 16 10C18 6 22 8 22 8" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
-              <span className="absolute -bottom-1 -right-1 w-2 h-2 bg-eco-neon rounded-full animate-pulse-slow" />
+              <span className="absolute -bottom-1 -right-1 w-2 h-2 rounded-full animate-pulse-slow" style={{ background: 'var(--accent)' }} />
             </div>
-            <span className="font-display font-bold text-2xl">EcoRuta</span>
+            <span className="font-display font-bold text-2xl" style={{ color: 'var(--text-primary)' }}>EcoRuta</span>
           </NavLink>
         </div>
 
         {/* Login Card */}
-        <div className="login-card card p-6 lg:p-8">
+        <div className="login-card surface-panel rounded-2xl p-6 lg:p-8">
           <div className="login-header text-center mb-8">
-            <h1 className="font-display font-bold text-2xl lg:text-3xl text-white mb-2">Iniciar Sesión</h1>
-            <p className="text-eco-green/60">Accede a tu cuenta para gestionar tus residuos</p>
+            <h1 className="font-display font-bold text-2xl lg:text-3xl mb-2" style={{ color: 'var(--text-primary)' }}>Iniciar Sesión</h1>
+            <p style={{ color: 'var(--text-secondary)' }}>Accede a tu cuenta para gestionar tus residuos</p>
           </div>
 
           {errors.form && (
-            <div className="mb-6 p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm" role="alert">
+            <div className="mb-6 p-3 rounded-lg text-sm" role="alert" style={{ background: 'var(--accent-coral)/10', borderColor: 'var(--accent-coral)/20', borderWidth: '1px', borderStyle: 'solid', color: 'var(--accent-coral)' }}>
               {errors.form}
             </div>
           )}
@@ -115,17 +116,17 @@ export default function Login() {
           <form onSubmit={handleSubmit} className="space-y-5" noValidate>
             {/* Email */}
             <div className="form-group">
-              <label htmlFor="email" className="block text-sm font-medium text-white mb-2">Correo Electrónico</label>
+              <label htmlFor="email" className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Correo Electrónico</label>
               <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-eco-green/50" aria-hidden="true" />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--text-muted)' }} aria-hidden="true" />
                 <input
                   type="email"
                   id="email"
                   name="email"
                   value={formData.email}
                   onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  onBlur={() => validateForm()}
-                  className={`input-field pl-12 pr-4 py-3.5 ${errors.email ? 'border-red-500/50 focus:border-red-500 focus:ring-red-500/20' : ''}`}
+                  onBlur={validateForm}
+                  className={`input-field pl-12 pr-4 py-3.5 ${errors.email ? 'border-[var(--accent-coral)]/50 focus:border-[var(--accent-coral)] focus:ring-[var(--accent-coral)]/20' : ''}`}
                   placeholder="tu@correo.com"
                   aria-invalid={errors.email ? 'true' : 'false'}
                   aria-describedby={errors.email ? 'email-error' : undefined}
@@ -133,25 +134,27 @@ export default function Login() {
                   autoComplete="email"
                 />
               </div>
-              {errors.email && <p id="email-error" className="mt-1.5 text-sm text-red-400" role="alert">{errors.email}</p>}
+              {errors.email && <p id="email-error" className="mt-1.5 text-sm" role="alert" style={{ color: 'var(--accent-coral)' }}>{errors.email}</p>}
             </div>
 
             {/* Password */}
             <div className="form-group">
               <div className="flex items-center justify-between mb-2">
-                <label htmlFor="password" className="block text-sm font-medium text-white">Contraseña</label>
-                <NavLink to="/forgot-password" className="text-xs text-eco-neon hover:text-eco-green transition-colors">¿Olvidaste?</NavLink>
+                <label htmlFor="password" className="block text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Contraseña</label>
+                <NavLink to="/forgot-password" className="text-xs transition-colors" style={{ color: 'var(--accent)' }}>
+                  ¿Olvidaste?
+                </NavLink>
               </div>
               <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-eco-green/50" aria-hidden="true" />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--text-muted)' }} aria-hidden="true" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   id="password"
                   name="password"
                   value={formData.password}
                   onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                  onBlur={() => validateForm()}
-                  className={`input-field pl-12 pr-12 py-3.5 ${errors.password ? 'border-red-500/50 focus:border-red-500 focus:ring-red-500/20' : ''}`}
+                  onBlur={validateForm}
+                  className={`input-field pl-12 pr-12 py-3.5 ${errors.password ? 'border-[var(--accent-coral)]/50 focus:border-[var(--accent-coral)] focus:ring-[var(--accent-coral)]/20' : ''}`}
                   placeholder="••••••••"
                   aria-invalid={errors.password ? 'true' : 'false'}
                   aria-describedby={errors.password ? 'password-error' : undefined}
@@ -161,14 +164,15 @@ export default function Login() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-eco-green/50 hover:text-eco-neon transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 transition-colors"
+                  style={{ color: 'var(--text-muted)' }}
                   aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                   aria-pressed={showPassword}
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
-              {errors.password && <p id="password-error" className="mt-1.5 text-sm text-red-400" role="alert">{errors.password}</p>}
+              {errors.password && <p id="password-error" className="mt-1.5 text-sm" role="alert" style={{ color: 'var(--accent-coral)' }}>{errors.password}</p>}
             </div>
 
             {/* Remember me */}
@@ -176,10 +180,11 @@ export default function Login() {
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
-                  className="w-4 h-4 accent-eco-neon rounded border-eco-border/50 bg-eco-surface"
+                  className="w-4 h-4 rounded border"
+                  style={{ accentColor: 'var(--accent)', borderColor: 'var(--border-default)', backgroundColor: 'var(--bg-surface)' }}
                   aria-label="Recordarme"
                 />
-                <span className="text-sm text-eco-green/70">Recordarme</span>
+                <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>Recordarme</span>
               </label>
             </div>
 
@@ -219,9 +224,9 @@ export default function Login() {
 
           {/* Footer */}
           <div className="login-footer text-center mt-6">
-            <p className="text-eco-green/60 text-sm">
+            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
               ¿No tienes cuenta?{' '}
-              <NavLink to="/register" className="text-eco-neon hover:text-eco-green font-medium transition-colors">
+              <NavLink to="/register" className="font-medium transition-colors" style={{ color: 'var(--accent)' }}>
                 Regístrate gratis
               </NavLink>
             </p>
@@ -229,12 +234,12 @@ export default function Login() {
         </div>
 
         {/* Benefits */}
-        <div className="mt-8 glass-panel rounded-2xl p-6 animate-in">
-          <h3 className="font-semibold text-white text-center mb-4 flex items-center justify-center gap-2">
-            <Leaf className="w-5 h-5 text-eco-neon" aria-hidden="true" />
+        <div className="mt-8 surface-panel rounded-2xl p-6 animate-in">
+          <h3 className="font-semibold text-center mb-4 flex items-center justify-center gap-2" style={{ color: 'var(--text-primary)' }}>
+            <Leaf className="w-5 h-5" style={{ color: 'var(--accent)' }} aria-hidden="true" />
             ¿Por qué EcoRuta?
           </h3>
-          <ul className="benefits-list space-y-3 text-sm text-eco-green/70">
+          <ul className="benefits-list space-y-3 text-sm" style={{ color: 'var(--text-secondary)' }}>
             {[
               { icon: Truck, text: 'Rutas de recolección en tiempo real' },
               { icon: MapPin, text: 'Puntos Limpios cercanos con recompensas' },
@@ -242,7 +247,7 @@ export default function Login() {
               { icon: Recycle, text: 'Guía oficial Resolución 2184/2019' },
             ].map((benefit, i) => (
               <li key={i} className="flex items-center gap-3">
-                <benefit.icon className="w-5 h-5 text-eco-green/50 flex-shrink-0" aria-hidden="true" />
+                <benefit.icon className="w-5 h-5 flex-shrink-0" style={{ color: 'var(--accent)' }} aria-hidden="true" />
                 <span>{benefit.text}</span>
               </li>
             ))}
