@@ -164,12 +164,12 @@ export default function CitizenApp() {
                 </div>
               </div>
               <div className="card-interactive card-padded bg-white/5 border-white/10 backdrop-blur-sm">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-col sm:flex-row sm:items-center">
                   <div className="w-11 h-11 rounded-lg bg-[var(--accent-amber)]/10 border border-[var(--accent-amber)]/20 flex items-center justify-center">
                     <span className="text-xl">🏆</span>
                   </div>
-                  <div>
-                    <p className="font-display font-bold text-2xl lg:text-3xl text-[var(--accent-amber)]">{user?.level || 'Eco Guardián'}</p>
+                  <div className="text-center sm:text-left">
+                    <p className="font-display font-bold text-lg sm:text-2xl lg:text-3xl text-[var(--accent-amber)] leading-tight">{user?.level || 'Eco Guardián'}</p>
                     <p className="text-xs text-white/50">Nivel actual</p>
                   </div>
                 </div>
@@ -181,22 +181,23 @@ export default function CitizenApp() {
 
       {/* Tabs - Clean, functional */}
       <div className="section-container px-0 relative z-10 -mt-6 lg:-mt-8">
-        <div ref={containerRef} className="flex gap-1.5 bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-lg p-1.5 w-fit mx-auto mb-8">
+        <div ref={containerRef} className="grid grid-cols-3 bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-lg p-1.5 w-full max-w-xs md:max-w-none mx-auto mb-8 md:grid-cols-3 md:flex md:items-center md:gap-1.5 md:p-1.5 md:rounded-lg">
           {[
-            { id: 'pickups', label: 'Próximas Recolecciones', icon: Truck },
-            { id: 'schedule', label: 'Calendario Semanal', icon: Calendar },
-            { id: 'notifications', label: 'Notificaciones', icon: Bell, badge: notifications.filter(n => !n.read).length },
+            { id: 'pickups', label: 'Próximas', fullLabel: 'Próximas Recolecciones', icon: Truck },
+            { id: 'schedule', label: 'Calendario', fullLabel: 'Calendario Semanal', icon: Calendar },
+            { id: 'notifications', label: 'Alertas', fullLabel: 'Notificaciones', icon: Bell, badge: notifications.filter(n => !n.read).length },
           ].map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`tab-btn relative flex items-center gap-2 px-4 py-2.5 rounded-md text-sm font-medium transition-all duration-[120ms] ease-[var(--ease-out)] ${
+              className={`tab-btn relative flex flex-col items-center gap-1 px-3 py-2.5 rounded-md text-sm font-medium transition-all duration-[120ms] ease-[var(--ease-out)] md:flex-row md:gap-2 ${
                 activeTab === tab.id
                   ? 'bg-[var(--bg-surface)] text-[var(--text-primary)] shadow-sm border border-[var(--border-subtle)]'
                   : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]/50'
               }`}>
               <tab.icon className="w-4 h-4" aria-hidden="true" />
-              {tab.label}
+              <span className="hidden md:inline">{tab.fullLabel}</span>
+              <span className="md:hidden text-xs leading-tight">{tab.label}</span>
               {tab.badge && tab.badge > 0 && (
                 <span className="absolute -top-1 -right-1 w-5 h-5 bg-[var(--accent-coral)] text-white text-xs font-bold rounded-full flex items-center justify-center">
                   {tab.badge > 9 ? '9+' : tab.badge}

@@ -126,8 +126,8 @@ export default function WasteGuide() {
               <span className="gradient-text">Resolución 2184/2019</span>
             </h1>
             <p className="text-lg max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
-              Separa correctamente: Contenedor <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>Blanco</span> (Aprovechables),
-              <span className="font-semibold" style={{ color: 'var(--accent)' }}>Verde</span> (Orgánicos) y
+              Separa correctamente: Contenedor <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>Blanco</span> (Aprovechables),{' '}
+              <span className="font-semibold" style={{ color: 'var(--accent)' }}>Verde</span> (Orgánicos) y{' '}
               <span className="font-semibold" style={{ color: 'var(--text-secondary)' }}>Negro</span> (No Aprovechables).
             </p>
           </div>

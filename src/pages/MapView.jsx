@@ -242,40 +242,81 @@ function createTruckIcon(isDark) {
   });
 }
 
-function MapControls({ visibleLayers, onToggleLayer, onLocate, onResetView, theme }) {
+function MapControls({ visibleLayers, onToggleLayer, onLocate, onResetView, theme, isMobileLayersOpen, onToggleMobileLayers, selectedTruck, selectedPoint }) {
   const isDark = theme === 'dark';
-  return (
-    <div className="map-controls absolute top-4 right-4 z-20 flex flex-col gap-2">
-      <div className="surface-panel rounded-xl p-2 shadow-lg flex flex-col gap-1 min-w-[200px]">
-        <div className="flex items-center gap-2 px-2 py-1 text-xs font-medium uppercase tracking-wider text-[var(--text-secondary)]">
-          <Layers className="w-4 h-4 text-[var(--text-secondary)]" aria-hidden="true" />
-          Capas del mapa
-        </div>
-        {[
-          { id: 'cleanPoints', label: 'Puntos Limpios', icon: Package },
-          { id: 'trucks', label: 'Flota de camiones', icon: Navigation },
-        ].map((layer) => (
-          <label key={layer.id} className="flex items-center gap-2 px-2 py-2 rounded-lg cursor-pointer transition-colors hover:bg-[var(--bg-elevated)]">
-            <input
-              type="checkbox"
-              checked={visibleLayers[layer.id]}
-              onChange={(e) => onToggleLayer(layer.id, e.target.checked)}
-              className="w-4 h-4 accent-[var(--accent)] rounded border-[var(--border-default)]"
-            />
-            <layer.icon className="w-4 h-4 text-[var(--accent)]" aria-hidden="true" />
-            <span className="text-sm text-[var(--text-primary)]">{layer.label}</span>
-          </label>
-        ))}
-      </div>
 
-      <div className="surface-panel rounded-xl p-2 shadow-lg flex flex-col gap-1">
-        <button onClick={onLocate} className="btn-ghost p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]" aria-label="Mi ubicación">
-          <Locate className="w-5 h-5" aria-hidden="true" />
-        </button>
-        <button onClick={onResetView} className="btn-ghost p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]" aria-label="Vista completa">
-          <ZoomIn className="w-5 h-5" aria-hidden="true" />
-        </button>
+  // Show mobile layers panel when open
+  if (isMobileLayersOpen) {
+    return (
+      <div className="map-controls absolute top-4 right-4 z-30 w-72">
+        <div className="surface-panel rounded-xl shadow-lg overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-subtle)]">
+            <div className="flex items-center gap-2 text-sm font-medium text-[var(--text-primary)]">
+              <Layers className="w-5 h-5 text-[var(--accent)]" aria-hidden="true" />
+              Capas y Leyenda
+            </div>
+            <button
+              onClick={onToggleMobileLayers}
+              className="p-1.5 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+              aria-label="Cerrar capas"
+            >
+              <X className="w-5 h-5" aria-hidden="true" />
+            </button>
+          </div>
+          <div className="p-4 space-y-4">
+            {[
+              { id: 'cleanPoints', label: 'Puntos Limpios', icon: Package, color: 'var(--accent)', bgColor: 'var(--accent)' },
+              { id: 'trucks', label: 'Flota de camiones', icon: Navigation, color: 'var(--accent-sky)', bgColor: 'var(--accent-sky)' },
+            ].map((layer) => (
+              <label key={layer.id} className="flex items-center gap-3 px-2 py-2 rounded-lg cursor-pointer transition-colors hover:bg-[var(--bg-elevated)]">
+                <input
+                  type="checkbox"
+                  checked={visibleLayers[layer.id]}
+                  onChange={(e) => onToggleLayer(layer.id, e.target.checked)}
+                  className="w-4 h-4 accent-[var(--accent)] rounded border-[var(--border-default)]"
+                />
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: layer.bgColor + '/10', border: '1px solid ' + layer.bgColor + '20' }}>
+                  <layer.icon className="w-4 h-4" style={{ color: layer.color }} aria-hidden="true" />
+                </div>
+                <span className="text-sm font-medium text-[var(--text-primary)]">{layer.label}</span>
+              </label>
+            ))}
+            <div className="pt-2 border-t border-[var(--border-subtle)] space-y-2 text-xs text-[var(--text-secondary)]">
+              {visibleLayers.cleanPoints && (
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full" style={{ background: 'var(--accent)' }} />
+                  <span>Puntos de reciclaje fijos, móviles y comunitarios</span>
+                </div>
+              )}
+              {visibleLayers.trucks && (
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full" style={{ background: 'var(--accent-sky)' }} />
+                  <span>Camiones en tiempo real con rutas OSRM</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
+    );
+  }
+
+  // Desktop: original controls
+  return (
+    <div className="map-controls absolute top-4 right-4 z-20 flex flex-col gap-2 lg:hidden">
+      {/* Mobile: pill button for layers */}
+      <button
+        onClick={onToggleMobileLayers}
+        className="surface-panel rounded-full px-4 py-2 shadow-lg flex items-center gap-2 whitespace-nowrap transition-all duration-200 hover:shadow-xl"
+        aria-label={isMobileLayersOpen ? 'Cerrar capas y leyenda' : 'Abrir capas y leyenda'}
+      >
+        <Layers className="w-5 h-5 text-[var(--accent)]" aria-hidden="true" />
+        <span className="text-sm font-medium text-[var(--text-primary)] hidden sm:inline">Capas y Leyenda</span>
+        <div className="flex gap-1">
+          <div className="w-2 h-2 rounded-full" style={{ background: 'var(--accent)' }} />
+          <div className="w-2 h-2 rounded-full" style={{ background: 'var(--accent-sky)' }} />
+        </div>
+      </button>
     </div>
   );
 }
@@ -353,6 +394,7 @@ function MapView() {
   const [selectedFeature, setSelectedFeature] = useState(null);
   const [hoveredTruckId, setHoveredTruckId] = useState(null);
   const [selectedTruckId, setSelectedTruckId] = useState(null);
+  const [isMobileLayersOpen, setIsMobileLayersOpen] = useState(false);
   // OSRM route cache per truck (in-memory, persists across renders)
   const [truckRoutesOSRM, setTruckRoutesOSRM] = useState({});
 
@@ -883,18 +925,67 @@ function MapView() {
         }}
       />
 
+      {/* Top-right: Layers button (mobile) / Layers panel (desktop) */}
       <MapControls
         visibleLayers={visibleLayers}
         onToggleLayer={toggleLayer}
         onLocate={handleLocate}
         onResetView={handleResetView}
         theme={theme}
+        isMobileLayersOpen={isMobileLayersOpen}
+        onToggleMobileLayers={() => setIsMobileLayersOpen(!isMobileLayersOpen)}
+        selectedTruck={selectedTruckId}
+        selectedPoint={selectedFeature}
       />
 
-      <MapLegend visibleLayers={visibleLayers} theme={theme} />
+      {/* Desktop Legend (lg+) */}
+      <div className="hidden lg:block">
+        <MapLegend visibleLayers={visibleLayers} theme={theme} />
+      </div>
 
-      {/* Info Panel */}
-      <div className="absolute bottom-4 right-4 z-[1000] surface-panel rounded-xl p-4 shadow-lg min-w-[280px] max-w-[320px]">
+      {/* Mobile: Vertical control bar on right edge */}
+      <div className="lg:hidden absolute right-2 top-16 z-20 flex flex-col gap-1.5">
+        <button
+          onClick={handleLocate}
+          className="w-10 h-10 surface-panel rounded-lg flex items-center justify-center shadow-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+          aria-label="Mi ubicación"
+        >
+          <Locate className="w-5 h-5" aria-hidden="true" />
+        </button>
+        <button
+          onClick={() => mapRef.current?.zoomIn()}
+          className="w-10 h-10 surface-panel rounded-lg flex items-center justify-center shadow-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+          aria-label="Acercar"
+        >
+          <ZoomIn className="w-5 h-5" aria-hidden="true" />
+        </button>
+        <button
+          onClick={() => mapRef.current?.zoomOut()}
+          className="w-10 h-10 surface-panel rounded-lg flex items-center justify-center shadow-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+          aria-label="Alejar"
+        >
+          <ZoomOut className="w-5 h-5" aria-hidden="true" />
+        </button>
+      </div>
+
+      {/* Mobile: Compact bottom info bar - hidden when truck or point selected */}
+      {(selectedTruckId || selectedFeature) ? null : (
+        <div className="lg:hidden absolute bottom-4 left-4 right-4 z-20 surface-panel rounded-xl px-4 py-3 shadow-lg">
+          <div className="flex items-center justify-center gap-6 text-sm">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full" style={{ background: 'var(--accent)' }} />
+              <span className="font-semibold text-[var(--text-primary)]">{cleanPoints.length} EcoPuntos</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full" style={{ background: 'var(--accent-sky)' }} />
+              <span className="font-semibold text-[var(--text-primary)]">{trucks.filter(t => t.status === 'active').length} Camiones activos</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Desktop: Info Panel (lg+) */}
+      <div className="hidden lg:block absolute bottom-4 right-4 z-[1000] surface-panel rounded-xl p-4 shadow-lg min-w-[280px] max-w-[320px]">
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold text-[var(--text-primary)]">Información rápida</h3>
         </div>

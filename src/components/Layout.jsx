@@ -96,7 +96,7 @@ export default function Layout() {
                 </svg>
                 <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-[var(--accent)] rounded-full animate-pulse"></span>
               </div>
-              <span className="font-display font-bold text-lg tracking-tight hidden sm:block">EcoRuta</span>
+              <span className="font-display font-bold text-base sm:text-lg tracking-tight">EcoRuta</span>
             </NavLink>
 
             {/* Center - Pill Navigation (Desktop only: lg+) */}
@@ -229,6 +229,15 @@ export default function Layout() {
             </div>
           </div>
 
+          {/* Mobile Menu Backdrop */}
+          {isMobileMenuOpen && (
+            <div
+              className="lg:hidden fixed inset-0 z-30 bg-black/50 backdrop-blur-xs"
+              onClick={() => setIsMobileMenuOpen(false)}
+              aria-hidden="true"
+            />
+          )}
+
           {/* Mobile Menu - Full width, aligned with header */}
           <div
             id="mobile-menu"
@@ -238,7 +247,7 @@ export default function Layout() {
             role="navigation"
             aria-label="Menú móvil"
           >
-            <div className="surface-panel rounded-2xl border border-[var(--border-subtle)] shadow-xl max-h-[calc(100dvh-5.5rem)] overflow-y-auto overscroll-contain">
+            <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-2xl shadow-xl max-h-[calc(100dvh-5.5rem)] overflow-y-auto overscroll-contain">
               <div className="p-4 space-y-1">
                 {filteredNavItems.map((item) => (
                   <NavLink
