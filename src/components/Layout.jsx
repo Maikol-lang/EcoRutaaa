@@ -1,6 +1,6 @@
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
 import { Menu, X, Leaf, MapPin, Truck, Recycle, Award, Bell, User, LogOut, Settings, Sun, Moon } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 
@@ -10,10 +10,54 @@ export default function Layout() {
   const { theme, toggleTheme } = useTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isHeaderHidden, setIsHeaderHidden] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const headerRef = useRef(null);
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
+
+  // Body scroll lock when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    };
+  }, [isMobileMenuOpen]);
+
+  // Header hide/show on scroll (disabled when mobile menu is open)
+  useEffect(() => {
+    const handleScroll = () => {
+      if (isMobileMenuOpen) return;
+
+      const currentScrollY = window.scrollY;
+      const headerHeight = headerRef.current?.offsetHeight || 0;
+
+      if (currentScrollY > lastScrollY && currentScrollY > headerHeight) {
+        // Scrolling down - hide header
+        setIsHeaderHidden(true);
+      } else if (currentScrollY < lastScrollY) {
+        // Scrolling up - show header
+        setIsHeaderHidden(false);
+      }
+
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isMobileMenuOpen, lastScrollY]);
 
   const navItems = [
     { id: 'home', path: '/app', label: 'Inicio', icon: Sun },
@@ -28,11 +72,19 @@ export default function Layout() {
     !isAuthenticated || (item.path !== '/rewards' || user?.role === 'citizen')
   );
 
+  const headerTransform = isHeaderHidden && !isMobileMenuOpen
+    ? 'translateY(calc(-100% - 2rem))'
+    : 'translateY(0)';
+
   return (
     <div className="min-h-screen flex flex-col bg-[var(--bg-canvas)] w-full max-w-full overflow-x-hidden">
       {/* Header - Floating Pill Style */}
-      <header className="fixed top-4 left-4 right-4 z-50 lg:top-6 lg:left-6 lg:right-6 w-full max-w-full">
-        <nav className="section-container" aria-label="Navegación principal">
+      <header
+        ref={headerRef}
+        className="fixed top-4 left-4 right-4 z-50 lg:top-6 lg:left-6 lg:right-6 w-full max-w-full transition-transform duration-300 ease-[var(--ease-out)]"
+        style={{ transform: headerTransform }}
+      >
+        <nav className="section-container w-full" aria-label="Navegación principal">
           <div className="h-16 bg-[var(--bg-canvas)]/80 backdrop-blur-md border border-[var(--border-subtle)] rounded-full flex items-center justify-between px-4 lg:px-6">
             {/* Logo - Left */}
             <NavLink to="/" className="flex items-center gap-2 text-[var(--accent)] shrink-0" aria-label="EcoRuta - Inicio">
@@ -177,22 +229,24 @@ export default function Layout() {
             </div>
           </div>
 
-          {/* Mobile Menu */}
+          {/* Mobile Menu - Full width, aligned with header */}
           <div
             id="mobile-menu"
-            className={`lg:hidden overflow-hidden transition-all duration-300 ease-[var(--ease-out)] ${isMobileMenuOpen ? 'max-h-96 opacity-100 pt-4' : 'max-h-0 opacity-0'}`}
+            className={`lg:hidden fixed left-4 right-4 top-full z-40 transition-all duration-300 ease-[var(--ease-out)] ${
+              isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'
+            }`}
             role="navigation"
             aria-label="Menú móvil"
           >
-            <div className="surface-panel rounded-2xl border border-[var(--border-subtle)] p-4 shadow-xl">
-              <div className="flex flex-col gap-1">
+            <div className="surface-panel rounded-2xl border border-[var(--border-subtle)] shadow-xl max-h-[calc(100dvh-5.5rem)] overflow-y-auto overscroll-contain">
+              <div className="p-4 space-y-1">
                 {filteredNavItems.map((item) => (
                   <NavLink
                     key={item.id}
                     to={item.path}
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={({ isActive }) => `
-                      flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium transition-all duration-[120ms] ease-[var(--ease-out)] min-h-[44px]
+                      flex items-center gap-3 px-3 py-2.5 rounded-lg text-base font-medium transition-all duration-[120ms] ease-[var(--ease-out)] min-h-[44px]
                       ${isActive
                         ? 'bg-[var(--accent)]/10 text-[var(--accent)] border border-[var(--accent)]/20'
                         : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]'
@@ -205,13 +259,13 @@ export default function Layout() {
                   </NavLink>
                 ))}
                 {!isAuthenticated && (
-                  <div className="flex flex-col gap-2 pt-4 border-t border-[var(--border-subtle)]">
+                  <div className="flex flex-col gap-2 pt-3 border-t border-[var(--border-subtle)]">
                     <NavLink to="/login" onClick={() => setIsMobileMenuOpen(false)} className="btn-secondary w-full justify-center min-h-[44px]">Iniciar Sesión</NavLink>
                     <NavLink to="/register" onClick={() => setIsMobileMenuOpen(false)} className="btn-primary w-full justify-center min-h-[44px]">Registrarse</NavLink>
                   </div>
                 )}
                 {isAuthenticated && (
-                  <div className="flex flex-col gap-2 pt-4 border-t border-[var(--border-subtle)]">
+                  <div className="flex flex-col gap-2 pt-3 border-t border-[var(--border-subtle)]">
                     <NavLink to="/profile" onClick={() => setIsMobileMenuOpen(false)} className="btn-secondary w-full justify-center min-h-[44px]">Mi Perfil</NavLink>
                     <NavLink to="/rewards" onClick={() => setIsMobileMenuOpen(false)} className="btn-primary w-full justify-center min-h-[44px]">Mis Puntos</NavLink>
                   </div>
