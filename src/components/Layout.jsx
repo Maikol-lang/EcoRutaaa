@@ -1,5 +1,5 @@
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
-import { Menu, X, Leaf, MapPin, Truck, Recycle, Award, Bell, User, LogOut, Settings, Sun, Moon } from 'lucide-react';
+import { Menu, X, Leaf, MapPin, Truck, Recycle, Award, Bell, User, LogOut, Settings, Sun, Moon, BarChart3 } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -65,6 +65,7 @@ export default function Layout() {
     { id: 'map', path: '/map', label: 'Mapa', icon: MapPin },
     { id: 'waste-guide', path: '/waste-guide', label: 'Clasificación', icon: Recycle },
     { id: 'clean-points', path: '/clean-points', label: 'Puntos', icon: Leaf },
+    { id: 'stats', path: '/stats', label: 'Estadísticas', icon: BarChart3 },
     { id: 'rewards', path: '/rewards', label: 'Recompensas', icon: Award },
   ];
 

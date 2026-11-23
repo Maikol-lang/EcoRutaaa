@@ -4,7 +4,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { NavLink } from 'react-router-dom';
 import Hero from '../components/Hero';
-import { CheckCircle, Truck, MapPin, Leaf, Recycle, Award, Users, Target, Shield, Smartphone, Globe, Zap, ArrowRight } from 'lucide-react';
+import { CheckCircle, Truck, MapPin, Leaf, Recycle, Award, Users, Target, Shield, Smartphone, Globe, Zap, ArrowRight, BarChart3 } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -33,7 +33,6 @@ const testimonials = [
 const liveMetrics = [
   { value: 32, label: 'Ciudadanos activos', suffix: 'K+', icon: Users, trend: '+12%' },
   { value: 57.5, label: 'Toneladas/día', suffix: '', icon: Truck, trend: '+8%', decimals: true },
-  { value: 94, label: 'Cumplimiento rutas', suffix: '%', icon: Target, trend: '+3%' },
   { value: 1240, label: 'CO₂ evitadas/año', suffix: ' t', icon: Leaf, trend: '+15%' },
 ];
 
@@ -141,12 +140,12 @@ export default function Landing() {
     <div ref={containerRef} className="min-h-screen bg-[var(--bg-canvas)]">
       <Hero />
 
-      {/* Live Metrics Bar */}
-      <section ref={metricsRef} className="py-12 lg:py-16 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]">
+      {/* Executive Metrics Strip */}
+      <section ref={metricsRef} className="py-8 lg:py-10 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]">
         <div className="section-container">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6 items-center">
             {liveMetrics.map((metric) => (
-              <div key={metric.label} className="metric-card card-interactive card-padded relative">
+              <div key={metric.label} className="metric-card card-interactive card-padded relative lg:col-span-1">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <p className="text-[var(--text-muted)] text-xs uppercase tracking-wider font-medium mb-1">{metric.label}</p>
@@ -166,6 +165,14 @@ export default function Landing() {
                 </div>
               </div>
             ))}
+            <NavLink
+              to="/stats"
+              className="lg:col-span-1 flex items-center justify-center lg:justify-end gap-2 px-4 py-3 text-[var(--accent)] font-medium hover:text-[var(--accent-hover)] transition-colors group"
+            >
+              <span className="hidden sm:inline">Explorar estadísticas completas</span>
+              <span className="sm:hidden">Ver estadísticas</span>
+              <BarChart3 className="w-5 h-5 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
+            </NavLink>
           </div>
         </div>
       </section>

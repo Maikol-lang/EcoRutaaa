@@ -15,6 +15,7 @@ import CleanPoints from './pages/CleanPoints';
 import Notifications from './pages/Notifications';
 import Rewards from './pages/Rewards';
 import Profile from './pages/Profile';
+import Stats from './pages/Stats';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import './index.css';
@@ -68,6 +69,7 @@ function App() {
               <Route path="rewards" element={<RouteWrapper><Rewards /></RouteWrapper>} />
               <Route path="profile" element={<RouteWrapper><Profile /></RouteWrapper>} />
               <Route path="admin" element={<RouteWrapper><AdminPanel /></RouteWrapper>} />
+              <Route path="stats" element={<RouteWrapper><Stats /></RouteWrapper>} />
             </Route>
           </Routes>
           <Toaster
