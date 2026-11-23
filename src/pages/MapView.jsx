@@ -3,7 +3,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { gsap } from 'gsap';
 import { Link } from 'react-router-dom';
-import { Truck, MapPin, Leaf, Recycle, Building, Layers, Navigation, Locate, ZoomIn, ZoomOut, Filter, Info, Clock, User, Gauge, Activity, Sun, Moon, Package, Map as MapIcon } from 'lucide-react';
+import { Truck, MapPin, Leaf, Recycle, Building, Layers, Navigation, Locate, ZoomIn, ZoomOut, Filter, Info, Clock, User, Gauge, Activity, Sun, Moon, Package, Map as MapIcon, X } from 'lucide-react';
 import { trucks, routeStats } from '../data/routes';
 import { cleanPoints, cleanPointTypes } from '../data/cleanPoints';
 import { useTheme } from '../context/ThemeContext';
