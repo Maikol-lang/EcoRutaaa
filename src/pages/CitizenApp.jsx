@@ -3,7 +3,7 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { NavLink } from 'react-router-dom';
-import { MapPin, Clock, Truck, AlertCircle, CheckCircle, Calendar, Bell, Map, Route, RefreshCw, Loader2, Leaf, Recycle, Award, Users, Target, Plus, X, Trash2, Droplet, Battery, Cpu, Building, Send, MessageSquare, Check } from 'lucide-react';
+import { MapPin, Clock, Truck, AlertCircle, CheckCircle, Calendar, Bell, Map, Route, RefreshCw, Loader2, Leaf, Recycle, Award, Users, Target, Plus, X, Trash2, Droplet, Battery, Cpu, Building, Send, MessageSquare, Check, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { collectionRoutes, gironotCollectionSchedule } from '../data/routes';
 import { toast } from 'sonner';
