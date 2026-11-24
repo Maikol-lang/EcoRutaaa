@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { BarChart3, TrendingUp, ChevronDown, Users, Truck, Leaf, Target, Award, MapPin, Calendar, X } from 'lucide-react';
+import { BarChart3, TrendingUp, ChevronDown, Users, Truck, Leaf, Target, Award, MapPin, Calendar, X, Recycle } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
