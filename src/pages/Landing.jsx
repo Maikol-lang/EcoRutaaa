@@ -4,7 +4,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { NavLink } from 'react-router-dom';
 import Hero from '../components/Hero';
-import { CheckCircle, Truck, MapPin, Leaf, Recycle, Award, Users, Target, Shield, Smartphone, Globe, Zap, ArrowRight, BarChart3 } from 'lucide-react';
+import { CheckCircle, Truck, MapPin, Leaf, Recycle, Award, Users, Target, Shield, Smartphone, Globe, Zap, ArrowRight, BarChart3, Bell, BookOpen } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -17,7 +17,7 @@ const howItWorks = [
 
 const benefits = [
   { icon: Target, title: 'Precisión', desc: 'Rutas optimizadas con GPS, horarios exactos y notificaciones push' },
-  { icon: Leaf, title: 'Sostenibilidad', desc: 'Reduce tu huella de carbono: 187 kg CO₂ ahorrados por usuario al año' },
+  { icon: Bell, title: 'Alertas Inteligentes', desc: 'Notificaciones predictivas: cuándo sacar la basura, cambios de ruta, contenedores llenos' },
   { icon: Award, title: 'Recompensas Reales', desc: 'Descuentos en 50+ comercios, talleres, experiencias y más' },
   { icon: Users, title: 'Comunidad', desc: '15K+ vecinos colaborando, reportando y mejorando su barrio' },
   { icon: Shield, title: 'Datos Abiertos', desc: 'Transparencia total: métricas públicas, auditoría ciudadana' },
@@ -140,45 +140,60 @@ export default function Landing() {
     <div ref={containerRef} className="min-h-screen bg-[var(--bg-canvas)]">
       <Hero />
 
-      {/* Executive Metrics Strip */}
+      {/* Executive Metrics Strip - 4 KPIs + Executive Card with CTA */}
       <section ref={metricsRef} className="py-8 lg:py-10 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]">
         <div className="section-container">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6 items-center">
-            {liveMetrics.map((metric) => (
-              <div key={metric.label} className="metric-card card-interactive card-padded relative lg:col-span-1">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="text-[var(--text-muted)] text-xs uppercase tracking-wider font-medium mb-1">{metric.label}</p>
-                    <div className="flex items-baseline gap-1">
-                      <span className="metric-value font-display font-bold text-3xl lg:text-4xl text-[var(--text-primary)] tabular-nums"
-                           data-target={metric.value}
-                           data-suffix={metric.suffix}
-                           data-decimals={metric.decimals || false}>
-                        0
-                      </span>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6 items-start">
+            {/* 4 KPIs in 2x2 grid (8 cols) */}
+            <div className="lg:col-span-8 grid grid-cols-2 gap-4 lg:gap-6">
+              {liveMetrics.map((metric) => (
+                <div key={metric.label} className="metric-card card-interactive card-padded relative">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-[var(--text-muted)] text-xs uppercase tracking-wider font-medium mb-1">{metric.label}</p>
+                      <div className="flex items-baseline gap-1">
+                        <span className="metric-value font-display font-bold text-3xl lg:text-4xl text-[var(--text-primary)] tabular-nums"
+                             data-target={metric.value}
+                             data-suffix={metric.suffix}
+                             data-decimals={metric.decimals || false}>
+                          0
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 self-start">
+                      <metric.icon className="w-5 h-5 text-[var(--accent)]" aria-hidden="true" />
+                      <span className="text-[var(--accent)] text-sm font-medium">{metric.trend}</span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1.5 self-start">
-                    <metric.icon className="w-5 h-5 text-[var(--accent)]" aria-hidden="true" />
-                    <span className="text-[var(--accent)] text-sm font-medium">{metric.trend}</span>
-                  </div>
                 </div>
+              ))}
+            </div>
+            {/* Executive Impact Card + CTA (4 cols) */}
+            <div className="lg:col-span-4">
+              <div className="card-interactive card-padded h-full bg-gradient-to-br from-[var(--accent)]/5 via-transparent to-[var(--accent-lime)]/5 border border-[var(--accent)]/20">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-[var(--accent)]/10 border border-[var(--accent)]/20 flex items-center justify-center">
+                    <Recycle className="w-5 h-5 text-[var(--accent)]" aria-hidden="true" />
+                  </div>
+                  <span className="badge badge-success">Impacto en Vivo</span>
+                </div>
+                <h3 className="font-display font-semibold text-h3 text-[var(--text-primary)] mb-3">Tu barrio en tiempo real</h3>
+                <p className="text-[var(--text-secondary)] leading-relaxed mb-6">Métricas actualizadas cada hora: rutas activas, toneladas recuperadas, CO₂ evitado y cumplimiento por sector.</p>
+                <NavLink
+                  to="/stats"
+                  className="btn-primary w-full justify-center group"
+                >
+                  Explorar estadísticas completas
+                  <BarChart3 className="w-5 h-5 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
+                </NavLink>
               </div>
-            ))}
-            <NavLink
-              to="/stats"
-              className="lg:col-span-1 flex items-center justify-center lg:justify-end gap-2 px-4 py-3 text-[var(--accent)] font-medium hover:text-[var(--accent-hover)] transition-colors group"
-            >
-              <span className="hidden sm:inline">Explorar estadísticas completas</span>
-              <span className="sm:hidden">Ver estadísticas</span>
-              <BarChart3 className="w-5 h-5 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
-            </NavLink>
+            </div>
           </div>
         </div>
       </section>
 
       {/* How It Works - Interactive Stepper */}
-      <section ref={howItWorksRef} className="py-20 lg:py-28 bg-[var(--bg-canvas)]">
+      <section ref={howItWorksRef} className="py-12 lg:py-16 bg-[var(--bg-canvas)]">
         <div className="section-container">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="section-title">Cómo funciona EcoRuta</h2>
@@ -253,40 +268,42 @@ export default function Landing() {
       </section>
 
       {/* Benefits - Bento Grid Asimétrico */}
-      <section ref={benefitsRef} className="py-20 lg:py-28 bg-[var(--bg-surface)]">
+      <section ref={benefitsRef} className="py-12 lg:py-16 bg-[var(--bg-surface)]">
         <div className="section-container">
-          <div className="text-center max-w-3xl mx-auto mb-16">
+          <div className="text-center max-w-3xl mx-auto mb-12">
             <h2 className="section-title">Por qué miles eligen EcoRuta</h2>
             <p className="section-subtitle">Resultados medibles, comunidad real, impacto tangible</p>
           </div>
 
           {/* Asymmetric Bento Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
-            {/* Card 1 - Large: CO2 Impact */}
+            {/* Card 1 - Large: Alertas Inteligentes */}
             <div className="lg:col-span-7 lg:row-span-2 benefit-card card-interactive relative overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-br from-[var(--accent)]/5 via-transparent to-[var(--accent-lime)]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" aria-hidden="true" />
+              <div className="absolute inset-0 bg-gradient-to-br from-[var(--accent-sky)]/5 via-transparent to-[var(--accent)]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" aria-hidden="true" />
               <div className="relative z-10 h-full flex flex-col p-8 lg:p-10">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-12 h-12 rounded-xl bg-[var(--accent)]/10 border border-[var(--accent)]/20 flex items-center justify-center">
-                    <Leaf className="w-6 h-6 text-[var(--accent)]" aria-hidden="true" />
+                  <div className="w-12 h-12 rounded-xl bg-[var(--accent-sky)]/10 border border-[var(--accent-sky)]/20 flex items-center justify-center">
+                    <Bell className="w-6 h-6 text-[var(--accent-sky)]" aria-hidden="true" />
                   </div>
                   <div>
-                    <span className="badge badge-success">Impacto Medible</span>
+                    <span className="badge badge-info">Experiencia Ciudadana</span>
                   </div>
                 </div>
-                <h3 className="font-display font-bold text-display-sm lg:text-display-md text-[var(--text-primary)] mb-4">187 kg CO₂ ahorrados por usuario al año</h3>
-                <p className="text-[var(--text-secondary)] text-lg leading-relaxed mb-8 flex-1">Cada hogar que separa correctamente sus residuos evita el equivalente a 935 km en coche. Tu barrio ya suma 1,240 toneladas anuales.</p>
-                {/* Mini visualization */}
-                <div className="pt-6 border-t border-[var(--border-subtle)]">
-                  <div className="flex items-end gap-2 h-32 mb-3">
-                    {['Ene', 'Mar', 'May', 'Jul', 'Sep', 'Nov'].map((month, idx) => (
-                      <div key={month} className="flex-1 flex flex-col items-center">
-                        <div className={`w-full rounded-t bg-[var(--accent)] transition-all duration-500`} style={{ height: `${[45, 52, 68, 71, 82, 100][idx]}%` }} />
-                        <span className="text-xs text-[var(--text-muted)] mt-2">{month}</span>
-                      </div>
-                    ))}
+                <h3 className="font-display font-bold text-display-sm lg:text-display-md text-[var(--text-primary)] mb-4">Alertas Inteligentes de Recolección</h3>
+                <p className="text-[var(--text-secondary)] text-lg leading-relaxed mb-8 flex-1">Notificaciones predictivas: cuándo sacar cada contenedor, cambios de ruta por clima o eventos, contenedores próximos a llenarse. Nunca más adivinar horarios.</p>
+                <div className="grid grid-cols-3 gap-4 pt-6 border-t border-[var(--border-subtle)]">
+                  <div className="text-center">
+                    <p className="font-display font-bold text-2xl text-[var(--accent-sky)]">30 min</p>
+                    <p className="text-sm text-[var(--text-muted)]">Antelación media</p>
                   </div>
-                  <p className="text-sm text-[var(--text-muted)]">Reducción mensual de CO₂ (toneladas) — Girardot 2025</p>
+                  <div className="text-center">
+                    <p className="font-display font-bold text-2xl text-[var(--accent)]">98%</p>
+                    <p className="text-sm text-[var(--text-muted)]">Precisión alertas</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="font-display font-bold text-2xl text-[var(--accent-lime)]">4.1K</p>
+                    <p className="text-sm text-[var(--text-muted)]">Activas/día</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -297,8 +314,8 @@ export default function Landing() {
                 <div className="w-11 h-11 rounded-xl bg-[var(--accent-amber)]/10 border border-[var(--accent-amber)]/20 flex items-center justify-center mb-5">
                   <Shield className="w-5 h-5 text-[var(--accent-amber)]" aria-hidden="true" />
                 </div>
-                <h3 className="font-display font-semibold text-h3 text-[var(--text-primary)] mb-3">Resolución 2184/2019 Oficial</h3>
-                <p className="text-[var(--text-secondary)] leading-relaxed mb-6 flex-1">Única app con la guía oficial del Ministerio de Ambiente: contenedor blanco (aprovechables), verde (orgánicos), negro (no aprovechables).</p>
+                <h3 className="font-display font-semibold text-h3 text-[var(--text-primary)] mb-3">Guía Interactiva Resolución 2184</h3>
+                <p className="text-[var(--text-secondary)] leading-relaxed mb-6 flex-1">Única app con la guía oficial del Ministerio de Ambiente: contenedor blanco (aprovechables), verde (orgánicos), negro (no aprovechables). Búsqueda por residuo y escáner.</p>
                 <div className="flex items-center gap-3 pt-4 border-t border-[var(--border-subtle)]">
                   <span className="badge badge-warning">Certificado</span>
                   <span className="text-sm text-[var(--text-muted)]">Validado por MADS</span>
@@ -384,7 +401,7 @@ export default function Landing() {
       </section>
 
       {/* Testimonials */}
-      <section ref={testimonialsRef} className="py-20 lg:py-28 bg-[var(--bg-canvas)]">
+      <section ref={testimonialsRef} className="py-12 lg:py-16 bg-[var(--bg-canvas)]">
         <div className="section-container">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="section-title">Lo que dice la comunidad</h2>
@@ -420,7 +437,7 @@ export default function Landing() {
       </section>
 
       {/* CTA Section */}
-      <section ref={ctaRef} className="py-20 lg:py-28 relative overflow-hidden">
+      <section ref={ctaRef} className="py-12 lg:py-16 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-[var(--bg-canvas)] via-[var(--bg-surface)] to-[#064E3B]" aria-hidden="true" />
         <div className="absolute inset-0" aria-hidden="true">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-[var(--accent)]/10 blur-3xl" />

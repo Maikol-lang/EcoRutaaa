@@ -74,9 +74,9 @@ const zoneData = [
 ];
 
 const classificationData = [
-  { label: 'Aprovechables (Blanco)', value: 54, color: '#F8FAFC', darkColor: '#1E293B', border: '#CBD5E1' },
-  { label: 'Orgánicos (Verde Esmeralda)', value: 28, color: '#10B981', darkColor: '#059669', border: '#34D399' },
-  { label: 'No Aprovechables (Negro)', value: 18, color: '#1E293B', darkColor: '#0F172A', border: '#334155' },
+  { label: 'Aprovechables (Blanco)', value: 54, color: '#CBD5E1', darkColor: '#94A3B8', border: '#E2E8F0' },
+  { label: 'Orgánicos (Verde)', value: 28, color: '#10B981', darkColor: '#059669', border: '#34D399' },
+  { label: 'No Aprovechables (Negro)', value: 18, color: '#475569', darkColor: '#334155', border: '#64748B' },
 ];
 
 export default function Stats() {
@@ -157,25 +157,16 @@ export default function Stats() {
     return (value / maxValue) * containerHeight;
   };
 
-  const getDonutPath = (startAngle, endAngle, radius, innerRadius) => {
-    const start = startAngle * Math.PI / 180 - Math.PI / 2;
-    const end = endAngle * Math.PI / 180 - Math.PI / 2;
-    const x1 = radius * Math.cos(start);
-    const y1 = radius * Math.sin(start);
-    const x2 = radius * Math.cos(end);
-    const y2 = radius * Math.sin(end);
-    const largeArc = endAngle - startAngle > 180 ? 1 : 0;
-    const ix1 = innerRadius * Math.cos(start);
-    const iy1 = innerRadius * Math.sin(start);
-    const ix2 = innerRadius * Math.cos(end);
-    const iy2 = innerRadius * Math.sin(end);
-    return `M ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} L ${ix2} ${iy2} A ${innerRadius} ${innerRadius} 0 ${largeArc} 0 ${ix1} ${iy1} Z`;
-  };
+  const DONUT_RADIUS = 70;
+  const DONUT_STROKE = 22;
+  const DONUT_CIRCUMFERENCE = 2 * Math.PI * DONUT_RADIUS;
 
   const donutSegments = classificationData.map((item, i) => {
     const start = classificationData.slice(0, i).reduce((acc, d) => acc + d.value, 0) * 3.6;
     const end = start + item.value * 3.6;
-    return { ...item, start, end };
+    const dashArray = (item.value / 100) * DONUT_CIRCUMFERENCE;
+    const dashOffset = DONUT_CIRCUMFERENCE - (start / 360) * DONUT_CIRCUMFERENCE - dashArray;
+    return { ...item, start, end, dashArray, dashOffset };
   });
 
   return (
@@ -262,12 +253,12 @@ export default function Stats() {
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 mb-8 lg:mb-12" aria-label="Gráficos principales">
           {/* Evolution Chart - Left (7 cols) */}
           <div ref={evolutionRef} className="lg:col-span-7 evolution-card card card-padded">
-            <div className="flex items-center justify-between mb-6">
+            <div className="mb-6">
               <div>
                 <h2 className="font-display font-semibold text-h3 text-[var(--text-primary)]">Evolución de Recolección</h2>
                 <p className="text-[var(--text-secondary)] text-sm mt-1">Aprovechables vs. Ordinarios en el tiempo</p>
               </div>
-              <div className="flex items-center gap-4 text-sm text-[var(--text-muted)]">
+              <div className="flex items-center gap-6 text-sm text-[var(--text-muted)] mt-4">
                 <span className="flex items-center gap-1.5">
                   <span className="w-3 h-3 rounded-full" style={{ backgroundColor: '#10B981' }}></span>
                   Aprovechables
@@ -278,7 +269,7 @@ export default function Stats() {
                 </span>
               </div>
             </div>
-            <div className="chart-container relative h-[320px] lg:h-[380px]">
+            <div className="chart-container relative h-[320px] lg:h-[380px] pt-10">
               <svg className="w-full h-full" viewBox="0 0 800 380" preserveAspectRatio="none" role="img" aria-label="Gráfico de barras comparando residuos aprovechables y ordinarios">
                 <defs>
                   <linearGradient id="aprovechables-gradient" x1="0" y1="0" x2="0" y2="1">
@@ -423,44 +414,41 @@ export default function Stats() {
                       </linearGradient>
                     ))}
                   </defs>
-                  <circle cx="100" cy="100" r="80" fill="var(--bg-elevated)" />
+                  {/* Background circle */}
+                  <circle cx="100" cy="100" r={DONUT_RADIUS} fill="none" stroke="var(--bg-elevated)" strokeWidth={DONUT_STROKE} />
+                  {/* Segments */}
                   {donutSegments.map((seg, i) => (
-                    <path
+                    <circle
                       key={i}
-                      d={getDonutPath(seg.start, seg.end, 80, 50)}
-                      fill={`url(#donut-gradient-${i})`}
-                      stroke="var(--bg-canvas)"
-                      strokeWidth={2}
+                      cx="100"
+                      cy="100"
+                      r={DONUT_RADIUS}
+                      fill="none"
+                      stroke={`url(#donut-gradient-${i})`}
+                      strokeWidth={DONUT_STROKE}
+                      strokeDasharray={`${seg.dashArray} ${DONUT_CIRCUMFERENCE}`}
+                      strokeDashoffset={seg.dashOffset}
+                      strokeLinecap="round"
+                      transform="rotate(-90 100 100)"
                       onMouseEnter={() => setHoveredDonutSegment(i)}
                       onMouseLeave={() => setHoveredDonutSegment(null)}
                       style={{ cursor: 'pointer', transition: 'filter 0.2s' }}
                       filter={hoveredDonutSegment === i ? 'drop-shadow(0 4px 12px rgba(0,0,0,0.2))' : 'none'}
                     />
                   ))}
-                  <circle cx="100" cy="100" r="50" fill="var(--bg-surface)" />
-                  <text x="100" y="96" fontSize="28" fontWeight="700" fill="var(--text-primary)" fontFamily="Fraunces" textAnchor="middle" dominantBaseline="middle">
-                    100%
+                  {/* Center text */}
+                  <text x="100" y="92" fontSize="28" fontWeight="700" fill="var(--text-primary)" fontFamily="Fraunces" textAnchor="middle" dominantBaseline="middle">
+                    {hoveredDonutSegment !== null ? `${donutSegments[hoveredDonutSegment].value}%` : '100%'}
                   </text>
-                  <text x="100" y="118" fontSize="11" fill="var(--text-muted)" fontFamily="DM Sans" textAnchor="middle" dominantBaseline="middle">
-                    Total clasificado
+                  <text x="100" y="114" fontSize="11" fill="var(--text-muted)" fontFamily="DM Sans" textAnchor="middle" dominantBaseline="middle">
+                    {hoveredDonutSegment !== null ? donutSegments[hoveredDonutSegment].label : 'Total clasificado'}
                   </text>
-                  {hoveredDonutSegment !== null && (
-                    <g>
-                      <rect x="30" y="30" width="140" height="50" rx={8} fill="var(--bg-surface)" stroke="var(--border-subtle)" filter="drop-shadow(0 4px 12px rgba(0,0,0,0.15))" />
-                      <text x="100" y="56" fontSize="13" fontWeight="600" fill="var(--text-primary)" fontFamily="DM Sans" textAnchor="middle" dominantBaseline="middle">
-                        {donutSegments[hoveredDonutSegment].label}
-                      </text>
-                      <text x="100" y="72" fontSize="18" fontWeight="700" fill={donutSegments[hoveredDonutSegment].color} fontFamily="Fraunces" textAnchor="middle" dominantBaseline="middle">
-                        {donutSegments[hoveredDonutSegment].value}%
-                      </text>
-                    </g>
-                  )}
                 </svg>
               </div>
               <div className="flex-1 min-w-0">
                 <ul className="space-y-3" role="list" aria-label="Leyenda de clasificación">
                   {donutSegments.map((seg, i) => (
-                    <li key={i} className="flex items-center gap-3 p-2 rounded-lg hover:bg-[var(--bg-elevated)] transition-colors">
+                    <li key={i} className={`flex items-center gap-3 p-2 rounded-lg transition-colors ${hoveredDonutSegment === i ? 'bg-[var(--accent)]/10' : 'hover:bg-[var(--bg-elevated)]'}`}>
                       <div
                         className="w-4 h-4 rounded-full flex-shrink-0"
                         style={{
@@ -525,7 +513,6 @@ export default function Stats() {
                     <td className="py-4 px-4">
                       <div className="w-full max-w-xs">
                         <div className="flex items-center justify-between text-xs mb-1.5">
-                          <span className="text-[var(--text-secondary)]">Cumplimiento</span>
                           <span className="font-semibold text-[var(--text-primary)]">{zone.cumplimiento}%</span>
                         </div>
                         <div className="h-2 bg-[var(--bg-elevated)] rounded-full overflow-hidden">
