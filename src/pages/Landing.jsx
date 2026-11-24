@@ -143,17 +143,17 @@ export default function Landing() {
 
       {/* Executive Metrics Strip - 4 KPIs + Executive Card with CTA */}
       <section ref={metricsRef} className="py-8 lg:py-10 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]">
-        <div className="section-container">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6 items-start">
-            {/* 4 KPIs in 2x2 grid (8 cols) */}
-            <div className="lg:col-span-8 grid grid-cols-2 gap-4 lg:gap-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+            {/* 4 KPIs in 2x2/4-col grid (8 cols) */}
+            <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-4">
               {liveMetrics.map((metric) => (
-                <div key={metric.label} className="metric-card card-interactive card-padded relative">
+                <div key={metric.label} className="metric-card card-interactive p-5 relative">
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <p className="text-[var(--text-muted)] text-xs uppercase tracking-wider font-medium mb-1">{metric.label}</p>
                       <div className="flex items-baseline gap-1">
-                        <span className="metric-value font-display font-bold text-3xl lg:text-4xl text-[var(--text-primary)] tabular-nums"
+                        <span className="metric-value font-display font-bold text-2xl xl:text-3xl text-[var(--text-primary)] tabular-nums"
                              data-target={metric.value}
                              data-suffix={metric.suffix}
                              data-decimals={metric.decimals || false}>
@@ -171,20 +171,20 @@ export default function Landing() {
             </div>
             {/* Executive Impact Card + CTA (4 cols) */}
             <div className="lg:col-span-4">
-              <div className="card-interactive card-padded h-full bg-gradient-to-br from-[var(--accent)]/5 via-transparent to-[var(--accent-lime)]/5 border border-[var(--accent)]/20">
+              <div className="card-interactive p-6 h-full bg-gradient-to-br from-[var(--accent)]/5 via-transparent to-[var(--accent-lime)]/5 border border-[var(--accent)]/20 flex flex-col">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 rounded-xl bg-[var(--accent)]/10 border border-[var(--accent)]/20 flex items-center justify-center">
                     <Recycle className="w-5 h-5 text-[var(--accent)]" aria-hidden="true" />
                   </div>
-                  <span className="badge badge-success">Impacto en Vivo</span>
+                  <span className="badge badge-success">Impacto en Tiempo Real</span>
                 </div>
                 <h3 className="font-display font-semibold text-h3 text-[var(--text-primary)] mb-3">Tu barrio en tiempo real</h3>
-                <p className="text-[var(--text-secondary)] leading-relaxed mb-6">Métricas actualizadas cada hora: rutas activas, toneladas recuperadas, CO₂ evitado y cumplimiento por sector.</p>
+                <p className="text-[var(--text-secondary)] leading-relaxed mb-6 flex-1">Métricas actualizadas cada hora: rutas activas, toneladas recuperadas, CO₂ evitado y cumplimiento por sector en Girardot.</p>
                 <NavLink
                   to="/stats"
-                  className="btn-primary w-full justify-center group"
+                  className="btn-primary w-full justify-center group mt-auto"
                 >
-                  Explorar estadísticas completas
+                  Explorar estadísticas completas →
                   <BarChart3 className="w-5 h-5 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
                 </NavLink>
               </div>

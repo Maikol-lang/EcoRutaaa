@@ -298,80 +298,84 @@ export default function Stats() {
                   const maxVal = Math.max(...currentEvolution.flatMap(d => [d.aprovechables, d.ordinarios]));
                   const barWidth = Math.min(40, 680 / currentEvolution.length / 2.5);
                   const gap = (720 - currentEvolution.length * barWidth * 2) / (currentEvolution.length + 1);
-                  const xCenters = currentEvolution.map((_, i) =>
-                    60 + gap + i * (barWidth * 2 + gap) + barWidth + 2 // center between the two bars
-                  );
                   return (
-                    <>
-                      <g>
-                        {currentEvolution.map((data, i) => {
-                          const xBase = 60 + gap + i * (barWidth * 2 + gap);
-                          const aHeight = (data.aprovechables / maxVal) * 300;
-                          const oHeight = (data.ordinarios / maxVal) * 300;
-                          const isHovered = hoveredBar === i;
+                    <g>
+                      {currentEvolution.map((data, i) => {
+                        const xBase = 60 + gap + i * (barWidth * 2 + gap);
+                        const aHeight = (data.aprovechables / maxVal) * 300;
+                        const oHeight = (data.ordinarios / maxVal) * 300;
+                        const isHovered = hoveredBar === i;
 
-                          return (
-                            <g key={data.day} onMouseEnter={() => setHoveredBar(i)} onMouseLeave={() => setHoveredBar(null)} style={{ cursor: 'pointer' }}>
-                              <rect
-                                x={xBase}
-                                y={330 - aHeight}
-                                width={barWidth}
-                                height={aHeight}
-                                rx={3}
-                                fill="url(#aprovechables-gradient)"
-                                opacity={isHovered ? 1 : 0.85}
-                                filter={isHovered ? 'drop-shadow(0 4px 8px rgba(16,185,129,0.3))' : 'none'}
-                                transition="opacity 0.2s, filter 0.2s"
-                              />
-                              <rect
-                                x={xBase + barWidth + 4}
-                                y={330 - oHeight}
-                                width={barWidth}
-                                height={oHeight}
-                                rx={3}
-                                fill="url(#ordinarios-gradient)"
-                                opacity={isHovered ? 1 : 0.85}
-                                filter={isHovered ? 'drop-shadow(0 4px 8px rgba(100,116,139,0.3))' : 'none'}
-                                transition="opacity 0.2s, filter 0.2s"
-                              />
-                              <text
-                                x={xBase + barWidth + 2}
-                                y={348}
-                                fontSize="11"
-                                fill="var(--text-muted)"
-                                fontFamily="DM Sans"
-                                textAnchor="middle"
-                                dominantBaseline="hanging"
-                              >
-                                {data.day}
-                              </text>
-                            </g>
-                          );
-                        })}
-                      </g>
-                    </>
+                        return (
+                          <g key={data.day} onMouseEnter={() => setHoveredBar(i)} onMouseLeave={() => setHoveredBar(null)} style={{ cursor: 'pointer' }}>
+                            <rect
+                              x={xBase}
+                              y={330 - aHeight}
+                              width={barWidth}
+                              height={aHeight}
+                              rx={3}
+                              fill="url(#aprovechables-gradient)"
+                              opacity={isHovered ? 1 : 0.85}
+                              filter={isHovered ? 'drop-shadow(0 4px 8px rgba(16,185,129,0.3))' : 'none'}
+                              transition="opacity 0.2s, filter 0.2s"
+                            />
+                            <rect
+                              x={xBase + barWidth + 4}
+                              y={330 - oHeight}
+                              width={barWidth}
+                              height={oHeight}
+                              rx={3}
+                              fill="url(#ordinarios-gradient)"
+                              opacity={isHovered ? 1 : 0.85}
+                              filter={isHovered ? 'drop-shadow(0 4px 8px rgba(100,116,139,0.3))' : 'none'}
+                              transition="opacity 0.2s, filter 0.2s"
+                            />
+                            <text
+                              x={xBase + barWidth + 2}
+                              y={348}
+                              fontSize="11"
+                              fill="var(--text-muted)"
+                              fontFamily="DM Sans"
+                              textAnchor="middle"
+                              dominantBaseline="hanging"
+                            >
+                              {data.day}
+                            </text>
+                          </g>
+                        );
+                      })}
+                    </g>
                   );
                 })()}
               </svg>
-              {/* HTML Tooltip - outside SVG, no clipping */}
-              {hoveredBar !== null && (
-                <div
-                  className="absolute -top-2 left-1/2 -translate-x-1/2 -translate-y-full z-20 pointer-events-none whitespace-nowrap bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-lg px-3 py-2 shadow-lg"
-                  style={{ left: `${xCenters[hoveredBar]}px` }}
-                >
-                  <div className="font-semibold text-[var(--text-primary)] text-sm mb-1">{currentEvolution[hoveredBar].day}</div>
-                  <div className="text-[var(--text-secondary)] text-xs flex flex-col gap-0.5">
-                    <span className="flex items-center gap-1.5 text-[#10B981]">
-                      <span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#10B981' }}></span>
-                      Aprovechables: {currentEvolution[hoveredBar].aprovechables} Ton
-                    </span>
-                    <span className="flex items-center gap-1.5 text-[#64748B]">
-                      <span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#64748B' }}></span>
-                      Ordinarios: {currentEvolution[hoveredBar].ordinarios} Ton
-                    </span>
+              {/* HTML Tooltip - CSS positioned relative to chart container via hidden anchor divs */}
+              <div className="absolute inset-0 flex items-end justify-between px-4" style={{ pointerEvents: 'none' }}>
+                {currentEvolution.map((data, i) => (
+                  <div
+                    key={data.day}
+                    className="relative flex flex-col items-center flex-1"
+                    style={{ pointerEvents: 'auto' }}
+                    onMouseEnter={() => setHoveredBar(i)}
+                    onMouseLeave={() => setHoveredBar(null)}
+                  >
+                    {hoveredBar === i && (
+                      <div className="absolute -top-2 left-1/2 -translate-x-1/2 -translate-y-full z-20 pointer-events-none whitespace-nowrap bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-lg px-3 py-2 shadow-lg">
+                        <div className="font-semibold text-[var(--text-primary)] text-sm mb-1">{data.day}</div>
+                        <div className="text-[var(--text-secondary)] text-xs flex flex-col gap-0.5">
+                          <span className="flex items-center gap-1.5 text-[#10B981]">
+                            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#10B981' }}></span>
+                            Aprovechables: {data.aprovechables} Ton
+                          </span>
+                          <span className="flex items-center gap-1.5 text-[#64748B]">
+                            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#64748B' }}></span>
+                            Ordinarios: {data.ordinarios} Ton
+                          </span>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </div>
-              )}
+                ))}
+              </div>
             </div>
           </div>
 
