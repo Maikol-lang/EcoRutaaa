@@ -33,6 +33,7 @@ const testimonials = [
 const liveMetrics = [
   { value: 32, label: 'Ciudadanos activos', suffix: 'K+', icon: Users, trend: '+12%' },
   { value: 57.5, label: 'Toneladas/día', suffix: '', icon: Truck, trend: '+8%', decimals: true },
+  { value: 94, label: 'Cumplimiento rutas', suffix: '%', icon: Target, trend: '+3%' },
   { value: 1240, label: 'CO₂ evitadas/año', suffix: ' t', icon: Leaf, trend: '+15%' },
 ];
 

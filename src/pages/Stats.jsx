@@ -157,16 +157,14 @@ export default function Stats() {
     return (value / maxValue) * containerHeight;
   };
 
-  const DONUT_RADIUS = 70;
-  const DONUT_STROKE = 22;
-  const DONUT_CIRCUMFERENCE = 2 * Math.PI * DONUT_RADIUS;
+  // Donut using pathLength="100" for simple percentage-based dasharray
+  const DONUT_R = 38;
+  const DONUT_STROKE = 12;
 
   const donutSegments = classificationData.map((item, i) => {
-    const start = classificationData.slice(0, i).reduce((acc, d) => acc + d.value, 0) * 3.6;
-    const end = start + item.value * 3.6;
-    const dashArray = (item.value / 100) * DONUT_CIRCUMFERENCE;
-    const dashOffset = DONUT_CIRCUMFERENCE - (start / 360) * DONUT_CIRCUMFERENCE - dashArray;
-    return { ...item, start, end, dashArray, dashOffset };
+    const start = classificationData.slice(0, i).reduce((acc, d) => acc + d.value, 0);
+    const offset = 100 - start - item.value; // pathLength=100, so offset = 100 - cumulative% - value%
+    return { ...item, start, offset };
   });
 
   return (
@@ -269,7 +267,7 @@ export default function Stats() {
                 </span>
               </div>
             </div>
-            <div className="chart-container relative h-[320px] lg:h-[380px] pt-10">
+            <div className="chart-container relative h-[320px] lg:h-[380px] pt-10 overflow-visible">
               <svg className="w-full h-full" viewBox="0 0 800 380" preserveAspectRatio="none" role="img" aria-label="Gráfico de barras comparando residuos aprovechables y ordinarios">
                 <defs>
                   <linearGradient id="aprovechables-gradient" x1="0" y1="0" x2="0" y2="1">
@@ -296,116 +294,94 @@ export default function Stats() {
                   ))}
                 </g>
                 {/* Bars */}
-                <g>
-                  {currentEvolution.map((data, i) => {
-                    const maxVal = Math.max(...currentEvolution.flatMap(d => [d.aprovechables, d.ordinarios]));
-                    const barWidth = Math.min(40, 680 / currentEvolution.length / 2.5);
-                    const gap = (720 - currentEvolution.length * barWidth * 2) / (currentEvolution.length + 1);
-                    const xBase = 60 + gap + i * (barWidth * 2 + gap);
-                    const aHeight = (data.aprovechables / maxVal) * 300;
-                    const oHeight = (data.ordinarios / maxVal) * 300;
-                    const isHovered = hoveredBar === i;
+                {(() => {
+                  const maxVal = Math.max(...currentEvolution.flatMap(d => [d.aprovechables, d.ordinarios]));
+                  const barWidth = Math.min(40, 680 / currentEvolution.length / 2.5);
+                  const gap = (720 - currentEvolution.length * barWidth * 2) / (currentEvolution.length + 1);
+                  const xCenters = currentEvolution.map((_, i) =>
+                    60 + gap + i * (barWidth * 2 + gap) + barWidth + 2 // center between the two bars
+                  );
+                  return (
+                    <>
+                      <g>
+                        {currentEvolution.map((data, i) => {
+                          const xBase = 60 + gap + i * (barWidth * 2 + gap);
+                          const aHeight = (data.aprovechables / maxVal) * 300;
+                          const oHeight = (data.ordinarios / maxVal) * 300;
+                          const isHovered = hoveredBar === i;
 
-                    return (
-                      <g key={data.day} onMouseEnter={() => setHoveredBar(i)} onMouseLeave={() => setHoveredBar(null)} style={{ cursor: 'pointer' }}>
-                        {/* Aprovechables bar */}
-                        <rect
-                          x={xBase}
-                          y={330 - aHeight}
-                          width={barWidth}
-                          height={aHeight}
-                          rx={3}
-                          fill="url(#aprovechables-gradient)"
-                          opacity={isHovered ? 1 : 0.85}
-                          filter={isHovered ? 'drop-shadow(0 4px 8px rgba(16,185,129,0.3))' : 'none'}
-                          transition="opacity 0.2s, filter 0.2s"
-                        />
-                        {/* Ordinarios bar */}
-                        <rect
-                          x={xBase + barWidth + 4}
-                          y={330 - oHeight}
-                          width={barWidth}
-                          height={oHeight}
-                          rx={3}
-                          fill="url(#ordinarios-gradient)"
-                          opacity={isHovered ? 1 : 0.85}
-                          filter={isHovered ? 'drop-shadow(0 4px 8px rgba(100,116,139,0.3))' : 'none'}
-                          transition="opacity 0.2s, filter 0.2s"
-                        />
-                        {/* X-axis label */}
-                        <text
-                          x={xBase + barWidth + 2}
-                          y={348}
-                          fontSize="11"
-                          fill="var(--text-muted)"
-                          fontFamily="DM Sans"
-                          textAnchor="middle"
-                          dominantBaseline="hanging"
-                        >
-                          {data.day}
-                        </text>
-                        {/* Tooltip */}
-                        {isHovered && (
-                          <g>
-                            <rect
-                              x={xBase - 10}
-                              y={330 - Math.max(aHeight, oHeight) - 65}
-                              width={barWidth * 2 + 24}
-                              height={55}
-                              rx={6}
-                              fill="var(--bg-surface)"
-                              stroke="var(--border-subtle)"
-                              filter="drop-shadow(0 4px 12px rgba(0,0,0,0.15))"
-                            />
-                            <text
-                              x={xBase + barWidth + 2}
-                              y={330 - Math.max(aHeight, oHeight) - 48}
-                              fontSize="12"
-                              fill="var(--text-primary)"
-                              fontFamily="DM Sans"
-                              fontWeight="600"
-                              textAnchor="middle"
-                            >
-                              {data.day}
-                            </text>
-                            <text
-                              x={xBase + barWidth + 2}
-                              y={330 - Math.max(aHeight, oHeight) - 30}
-                              fontSize="11"
-                              fill="#10B981"
-                              fontFamily="DM Sans"
-                              fontWeight="500"
-                              textAnchor="middle"
-                            >
-                              Aprovechables: {data.aprovechables} Ton
-                            </text>
-                            <text
-                              x={xBase + barWidth + 2}
-                              y={330 - Math.max(aHeight, oHeight) - 16}
-                              fontSize="11"
-                              fill="#64748B"
-                              fontFamily="DM Sans"
-                              fontWeight="500"
-                              textAnchor="middle"
-                            >
-                              Ordinarios: {data.ordinarios} Ton
-                            </text>
-                          </g>
-                        )}
+                          return (
+                            <g key={data.day} onMouseEnter={() => setHoveredBar(i)} onMouseLeave={() => setHoveredBar(null)} style={{ cursor: 'pointer' }}>
+                              <rect
+                                x={xBase}
+                                y={330 - aHeight}
+                                width={barWidth}
+                                height={aHeight}
+                                rx={3}
+                                fill="url(#aprovechables-gradient)"
+                                opacity={isHovered ? 1 : 0.85}
+                                filter={isHovered ? 'drop-shadow(0 4px 8px rgba(16,185,129,0.3))' : 'none'}
+                                transition="opacity 0.2s, filter 0.2s"
+                              />
+                              <rect
+                                x={xBase + barWidth + 4}
+                                y={330 - oHeight}
+                                width={barWidth}
+                                height={oHeight}
+                                rx={3}
+                                fill="url(#ordinarios-gradient)"
+                                opacity={isHovered ? 1 : 0.85}
+                                filter={isHovered ? 'drop-shadow(0 4px 8px rgba(100,116,139,0.3))' : 'none'}
+                                transition="opacity 0.2s, filter 0.2s"
+                              />
+                              <text
+                                x={xBase + barWidth + 2}
+                                y={348}
+                                fontSize="11"
+                                fill="var(--text-muted)"
+                                fontFamily="DM Sans"
+                                textAnchor="middle"
+                                dominantBaseline="hanging"
+                              >
+                                {data.day}
+                              </text>
+                            </g>
+                          );
+                        })}
                       </g>
-                    );
-                  })}
-                </g>
+                    </>
+                  );
+                })()}
               </svg>
+              {/* HTML Tooltip - outside SVG, no clipping */}
+              {hoveredBar !== null && (
+                <div
+                  className="absolute -top-2 left-1/2 -translate-x-1/2 -translate-y-full z-20 pointer-events-none whitespace-nowrap bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-lg px-3 py-2 shadow-lg"
+                  style={{ left: `${xCenters[hoveredBar]}px` }}
+                >
+                  <div className="font-semibold text-[var(--text-primary)] text-sm mb-1">{currentEvolution[hoveredBar].day}</div>
+                  <div className="text-[var(--text-secondary)] text-xs flex flex-col gap-0.5">
+                    <span className="flex items-center gap-1.5 text-[#10B981]">
+                      <span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#10B981' }}></span>
+                      Aprovechables: {currentEvolution[hoveredBar].aprovechables} Ton
+                    </span>
+                    <span className="flex items-center gap-1.5 text-[#64748B]">
+                      <span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#64748B' }}></span>
+                      Ordinarios: {currentEvolution[hoveredBar].ordinarios} Ton
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
           {/* Donut Chart - Right (5 cols) */}
           <div ref={donutRef} className="lg:col-span-5 donut-card card card-padded">
             <h2 className="font-display font-semibold text-h3 text-[var(--text-primary)] mb-6">Clasificación Resolución 2184</h2>
-            <div className="flex flex-col lg:flex-row items-center gap-6">
-              <div className="chart-container relative w-full max-w-xs mx-auto lg:mx-0">
-                <svg className="w-full h-auto" viewBox="0 0 200 200" role="img" aria-label="Gráfico de dona mostrando clasificación de residuos: 54% Aprovechables, 28% Orgánicos, 18% No Aprovechables">
+            <div className="flex flex-col justify-between gap-6 w-full">
+              {/* Donut centered */}
+              <div className="chart-container relative w-44 h-44 mx-auto">
+                <svg className="w-full h-full" viewBox="0 0 100 100" role="img" aria-label="Gráfico de dona mostrando clasificación de residuos: 54% Aprovechables, 28% Orgánicos, 18% No Aprovechables">
                   <defs>
                     {donutSegments.map((seg, i) => (
                       <linearGradient key={i} id={`donut-gradient-${i}`} x1="0" y1="0" x2="1" y2="1">
@@ -415,21 +391,22 @@ export default function Stats() {
                     ))}
                   </defs>
                   {/* Background circle */}
-                  <circle cx="100" cy="100" r={DONUT_RADIUS} fill="none" stroke="var(--bg-elevated)" strokeWidth={DONUT_STROKE} />
-                  {/* Segments */}
+                  <circle cx="50" cy="50" r={DONUT_R} fill="none" stroke="var(--bg-elevated)" strokeWidth={DONUT_STROKE} />
+                  {/* Segments - pathLength="100" makes dasharray percentages direct */}
                   {donutSegments.map((seg, i) => (
                     <circle
                       key={i}
-                      cx="100"
-                      cy="100"
-                      r={DONUT_RADIUS}
+                      cx="50"
+                      cy="50"
+                      r={DONUT_R}
                       fill="none"
                       stroke={`url(#donut-gradient-${i})`}
                       strokeWidth={DONUT_STROKE}
-                      strokeDasharray={`${seg.dashArray} ${DONUT_CIRCUMFERENCE}`}
-                      strokeDashoffset={seg.dashOffset}
+                      strokeDasharray={`${seg.value} 100`}
+                      strokeDashoffset={seg.offset}
                       strokeLinecap="round"
-                      transform="rotate(-90 100 100)"
+                      transform="rotate(-90 50 50)"
+                      pathLength="100"
                       onMouseEnter={() => setHoveredDonutSegment(i)}
                       onMouseLeave={() => setHoveredDonutSegment(null)}
                       style={{ cursor: 'pointer', transition: 'filter 0.2s' }}
@@ -437,34 +414,40 @@ export default function Stats() {
                     />
                   ))}
                   {/* Center text */}
-                  <text x="100" y="92" fontSize="28" fontWeight="700" fill="var(--text-primary)" fontFamily="Fraunces" textAnchor="middle" dominantBaseline="middle">
+                  <text x="50" y="46" fontSize="14" fontWeight="700" fill="var(--text-primary)" fontFamily="Fraunces" textAnchor="middle" dominantBaseline="middle">
                     {hoveredDonutSegment !== null ? `${donutSegments[hoveredDonutSegment].value}%` : '100%'}
                   </text>
-                  <text x="100" y="114" fontSize="11" fill="var(--text-muted)" fontFamily="DM Sans" textAnchor="middle" dominantBaseline="middle">
+                  <text x="50" y="58" fontSize="6" fill="var(--text-muted)" fontFamily="DM Sans" textAnchor="middle" dominantBaseline="middle">
                     {hoveredDonutSegment !== null ? donutSegments[hoveredDonutSegment].label : 'Total clasificado'}
                   </text>
                 </svg>
               </div>
-              <div className="flex-1 min-w-0">
-                <ul className="space-y-3" role="list" aria-label="Leyenda de clasificación">
-                  {donutSegments.map((seg, i) => (
-                    <li key={i} className={`flex items-center gap-3 p-2 rounded-lg transition-colors ${hoveredDonutSegment === i ? 'bg-[var(--accent)]/10' : 'hover:bg-[var(--bg-elevated)]'}`}>
+              {/* Legend - full width, no truncate, no duplicate % */}
+              <div className="w-full flex flex-col gap-2.5">
+                {donutSegments.map((seg, i) => (
+                  <div
+                    key={i}
+                    className={`flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl border border-[var(--border-subtle)] transition-colors ${hoveredDonutSegment === i ? 'bg-[var(--accent)]/10' : 'hover:bg-[var(--bg-elevated)]'}`}
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
                       <div
-                        className="w-4 h-4 rounded-full flex-shrink-0"
+                        className="w-3 h-3 rounded-full flex-shrink-0"
                         style={{
                           background: `linear-gradient(135deg, ${seg.color}, ${seg.darkColor})`,
                           border: `1px solid ${seg.border}`
                         }}
                         aria-hidden="true"
                       />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-[var(--text-primary)] truncate">{seg.label}</p>
-                        <p className="text-xs text-[var(--text-muted)]">{seg.value}% del total</p>
-                      </div>
+                      <span className="text-sm font-medium text-[var(--text-primary)] whitespace-nowrap">{seg.label}</span>
+                    </div>
+                    <div className="flex items-center gap-4 shrink-0">
+                      {i === 0 && <span className="font-display font-semibold text-[var(--text-primary)] text-sm">93.2 Ton</span>}
+                      {i === 1 && <span className="font-display font-semibold text-[var(--text-primary)] text-sm">48.3 Ton</span>}
+                      {i === 2 && <span className="font-display font-semibold text-[var(--text-primary)] text-sm">31.0 Ton</span>}
                       <span className="font-display font-semibold text-[var(--text-primary)] text-sm">{seg.value}%</span>
-                    </li>
-                  ))}
-                </ul>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
