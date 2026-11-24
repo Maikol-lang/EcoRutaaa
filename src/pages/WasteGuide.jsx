@@ -337,7 +337,12 @@ function WasteItemCard({ item, details, category, index, isExpanded, onToggle, t
               <div className="space-y-2 text-sm">
                 {stats && Object.entries(stats).map(([key, value]) => (
                   <div key={key} className="flex justify-between">
-                    <span style={{ color: 'var(--text-secondary)' }}>{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</span>
+                    <span style={{ color: 'var(--text-secondary)' }}>
+                      {key === 'recoveryRate' ? 'Tasa de recuperación' :
+                       key === 'landfillHours' ? 'Degradación en relleno' :
+                       key === 'impact' ? 'Impacto ambiental' :
+                       key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                    </span>
                     <span className="font-medium" style={{ color: 'var(--accent)' }}>{value}</span>
                   </div>
                 ))}

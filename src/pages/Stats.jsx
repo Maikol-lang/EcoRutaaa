@@ -74,9 +74,9 @@ const zoneData = [
 ];
 
 const classificationData = [
-  { label: 'Aprovechables (Blanco)', value: 54, color: '#CBD5E1', darkColor: '#94A3B8', border: '#E2E8F0' },
+  { label: 'Aprovechables (Blanco)', value: 54, color: '#64748B', darkColor: '#94A3B8', border: '#E2E8F0' },
   { label: 'Orgánicos (Verde)', value: 28, color: '#10B981', darkColor: '#059669', border: '#34D399' },
-  { label: 'No Aprovechables (Negro)', value: 18, color: '#475569', darkColor: '#334155', border: '#64748B' },
+  { label: 'No Aprovechables (Negro)', value: 18, color: '#3498DB', darkColor: '#1D4ED8', border: '#60A5FA' },
 ];
 
 export default function Stats() {

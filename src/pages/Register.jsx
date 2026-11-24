@@ -328,8 +328,7 @@ export default function Register() {
                   disabled={isLoading}
                 />
                 <div className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                  Acepto los <NavLink to="/terms" className="font-medium underline transition-colors" style={{ color: 'var(--accent)' }}>Términos y Condiciones</NavLink> y la
-                  <NavLink to="/privacy" className="font-medium underline transition-colors" style={{ color: 'var(--accent)' }}>Política de Privacidad</NavLink>.
+                  Acepto los <NavLink to="/terms" className="font-medium underline transition-colors" style={{ color: 'var(--accent)' }}>Términos y Condiciones</NavLink> y la <NavLink to="/privacy" className="font-medium underline transition-colors" style={{ color: 'var(--accent)' }}>Política de Privacidad</NavLink>.
                   Autorizo el tratamiento de mis datos para la gestión de residuos según la Ley 1581/2012.
                 </div>
               </label>

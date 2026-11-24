@@ -3,7 +3,8 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { gsap } from 'gsap';
 import { Link } from 'react-router-dom';
-import { Truck, MapPin, Leaf, Recycle, Building, Layers, Navigation, Locate, ZoomIn, ZoomOut, Filter, Info, Clock, User, Gauge, Activity, Sun, Moon, Package, Map as MapIcon, X } from 'lucide-react';
+import { Truck, MapPin, Leaf, Recycle, Building, Layers, Navigation, Locate, ZoomIn, ZoomOut, Filter, Info, Clock, User, Gauge, Activity, Sun, Moon, Package, Map as MapIcon, X, Plus, AlertCircle } from 'lucide-react';
+import { NavLink } from 'react-router-dom';
 import { trucks, routeStats } from '../data/routes';
 import { cleanPoints, cleanPointTypes } from '../data/cleanPoints';
 import { useTheme } from '../context/ThemeContext';
@@ -966,6 +967,29 @@ function MapView() {
         >
           <ZoomOut className="w-5 h-5" aria-hidden="true" />
         </button>
+        {/* Report button - compact and discreet */}
+        <NavLink
+          to="/app"
+          className="w-10 h-10 surface-panel rounded-lg flex items-center justify-center shadow-lg text-[var(--accent-coral)] hover:text-[var(--accent-coral)] hover:bg-[var(--accent-coral)]/10 transition-colors"
+          aria-label="Reportar punto"
+        >
+          <Plus className="w-5 h-5" aria-hidden="true" />
+        </NavLink>
+      </div>
+
+      {/* Desktop: Floating report button - bottom right, compact */}
+      <div className="hidden lg:block absolute bottom-4 right-4 z-20">
+        <NavLink
+          to="/app"
+          className="surface-panel rounded-full px-3 py-2 shadow-lg flex items-center gap-2 whitespace-nowrap transition-all duration-200 hover:shadow-xl text-[var(--text-secondary)] hover:text-[var(--accent-coral)] border border-[var(--border-subtle)]"
+          aria-label="Reportar punto"
+        >
+          <div className="w-7 h-7 rounded-full flex items-center justify-center bg-[var(--accent-coral)]/10 border border-[var(--accent-coral)]/20">
+            <Plus className="w-4 h-4 text-[var(--accent-coral)]" aria-hidden="true" />
+          </div>
+          <span className="text-sm font-medium hidden sm:inline">Reportar punto</span>
+          <AlertCircle className="w-4 h-4 text-[var(--accent-coral)] hidden sm:inline" aria-hidden="true" />
+        </NavLink>
       </div>
 
       {/* Mobile: Compact bottom info bar - hidden when truck or point selected */}
