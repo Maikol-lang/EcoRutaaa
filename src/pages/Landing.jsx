@@ -145,27 +145,25 @@ export default function Landing() {
       <section ref={metricsRef} className="py-8 lg:py-10 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-            {/* 4 KPIs in 2x2/4-col grid (8 cols) */}
+            {/* 4 KPIs in 2x2/4-col grid (8 cols) - centered vertical layout */}
             <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-4">
               {liveMetrics.map((metric) => (
-                <div key={metric.label} className="metric-card card-interactive p-5 relative">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <p className="text-[var(--text-muted)] text-xs uppercase tracking-wider font-medium mb-1">{metric.label}</p>
-                      <div className="flex items-baseline gap-1">
-                        <span className="metric-value font-display font-bold text-2xl xl:text-3xl text-[var(--text-primary)] tabular-nums"
-                             data-target={metric.value}
-                             data-suffix={metric.suffix}
-                             data-decimals={metric.decimals || false}>
-                          0
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1.5 self-start">
+                <div key={metric.label} className="metric-card card-interactive flex flex-col items-center justify-center text-center p-6 gap-3 h-full relative">
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-10 h-10 rounded-xl bg-[var(--accent)]/10 border border-[var(--accent)]/20 flex items-center justify-center">
                       <metric.icon className="w-5 h-5 text-[var(--accent)]" aria-hidden="true" />
-                      <span className="text-[var(--accent)] text-sm font-medium">{metric.trend}</span>
                     </div>
+                    <span className="text-[var(--accent)] text-sm font-medium whitespace-nowrap">{metric.trend}</span>
                   </div>
+                  <div className="flex items-baseline justify-center gap-1">
+                    <span className="metric-value font-display font-bold text-3xl xl:text-4xl text-[var(--text-primary)] tabular-nums tracking-tight"
+                         data-target={metric.value}
+                         data-suffix={metric.suffix}
+                         data-decimals={metric.decimals || false}>
+                      0
+                    </span>
+                  </div>
+                  <p className="text-sm text-[var(--text-secondary)] leading-snug">{metric.label}</p>
                 </div>
               ))}
             </div>
@@ -313,7 +311,7 @@ export default function Landing() {
             <div className="lg:col-span-5 benefit-card card-interactive h-full">
               <div className="h-full p-6 lg:p-8 flex flex-col">
                 <div className="w-11 h-11 rounded-xl bg-[var(--accent-amber)]/10 border border-[var(--accent-amber)]/20 flex items-center justify-center mb-5">
-                  <Shield className="w-5 h-5 text-[var(--accent-amber)]" aria-hidden="true" />
+                  <BookOpen className="w-5 h-5 text-[var(--accent-amber)]" aria-hidden="true" />
                 </div>
                 <h3 className="font-display font-semibold text-h3 text-[var(--text-primary)] mb-3">Guía Interactiva Resolución 2184</h3>
                 <p className="text-[var(--text-secondary)] leading-relaxed mb-6 flex-1">Única app con la guía oficial del Ministerio de Ambiente: contenedor blanco (aprovechables), verde (orgánicos), negro (no aprovechables). Búsqueda por residuo y escáner.</p>

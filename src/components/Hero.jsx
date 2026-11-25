@@ -168,22 +168,6 @@ export default function Hero() {
                 <NavLink to="/waste-guide" className="btn-secondary btn-lg">Guía Oficial 2184</NavLink>
               </div>
 
-              {/* Stats - editorial cards with counter animation */}
-              <div ref={statsRef} className="hero-stats grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-                {stats.map((stat, i) => (
-                  <div key={stat.label} className="stat-card card-interactive card-padded text-center group">
-                    <stat.icon className="w-7 h-7 lg:w-8 lg:h-8 text-[var(--accent)] mx-auto mb-4 transition-transform group-hover:scale-110" aria-hidden="true" />
-                    <div className="stat-value font-display font-bold text-3xl lg:text-4xl text-[var(--text-primary)] mb-1.5"
-                         data-target={stat.value}
-                         data-suffix={stat.suffix}
-                         data-decimals={stat.decimals || false}>
-                      0
-                    </div>
-                    <div className="text-sm text-[var(--text-secondary)] font-medium leading-snug">{stat.label}</div>
-                  </div>
-                ))}
-              </div>
-
               {/* Features preview - card grid */}
               <div ref={featuresRef} className="features-preview mt-16">
                 <h2 className="font-display font-semibold text-h3 text-[var(--text-primary)] mb-10">Todo lo que necesitas en una app</h2>

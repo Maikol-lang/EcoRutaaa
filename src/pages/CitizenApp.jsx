@@ -59,7 +59,7 @@ const mockNotifications = [
 
 const getTypeStyles = (type) => {
   const styles = {
-    white: { bg: 'bg-[var(--accent)]/5', border: 'border-[var(--accent)]/10', text: 'text-[var(--accent)]', iconBg: 'bg-[var(--accent)]/10', accent: 'var(--accent)' },
+    white: { bg: 'bg-slate-200/15 dark:bg-slate-200/15', border: 'border-slate-200/20 dark:border-slate-200/20', text: 'text-slate-700 dark:text-slate-200', iconBg: 'bg-slate-200/15 dark:bg-slate-200/15', accent: 'var(--text-muted)' },
     green: { bg: 'bg-[var(--accent-lime)]/5', border: 'border-[var(--accent-lime)]/10', text: 'text-[var(--accent-lime)]', iconBg: 'bg-[var(--accent-lime)]/10', accent: 'var(--accent-lime)' },
     black: { bg: 'bg-[var(--text-muted)]/5', border: 'border-[var(--text-muted)]/10', text: 'text-[var(--text-muted)]', iconBg: 'bg-[var(--text-muted)]/10', accent: 'var(--text-muted)' },
   };
@@ -327,7 +327,7 @@ export default function CitizenApp() {
       </section>
 
       {/* Live Truck ETA Pills */}
-      <div className="section-container px-0 relative z-10 -mt-6 lg:-mt-8 mb-6">
+      <div className="section-container px-0 relative z-10 -mt-6 lg:-mt-8 mt-6 mb-8">
         <div className="grid grid-cols-3 gap-3 md:grid-cols-3 mx-auto max-w-5xl">
           {nextPickups.map((pickup, i) => {
             const styles = getTypeStyles(pickup.type);
