@@ -4,7 +4,8 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { NavLink } from 'react-router-dom';
 import Hero from '../components/Hero';
-import { CheckCircle, Truck, MapPin, Leaf, Recycle, Award, Users, Target, Shield, Smartphone, Globe, Zap, ArrowRight, BarChart3, Bell, BookOpen } from 'lucide-react';
+import { CheckCircle, Truck, MapPin, Leaf, Recycle, Award, Users, Target, Shield, Smartphone, Globe, Zap, ArrowRight, BarChart3, Bell, BookOpen, Plus, X, Sparkles, MapPin as MapPinIcon, User } from 'lucide-react';
+import { toast } from 'sonner';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -25,9 +26,18 @@ const benefits = [
 ];
 
 const testimonials = [
-  { name: 'María González', role: 'Vecina, El Prado', text: '"Por fin sé exactamente cuándo pasa el camión. Ya no tengo que dejar la bolsa en la esquina desde la noche anterior."', avatar: 'MG', points: 2340, level: 'Eco Guardián' },
-  { name: 'Carlos Mendoza', role: 'Conductor ECO-001', text: '"La app me optimiza la ruta y los vecinos salen a tiempo. Antes perdía 40 min esperando; ahora todo fluye."', avatar: 'CM', points: 0, level: 'Operador' },
-  { name: 'Ana Patricia', role: 'Comerciante, Centro', text: '"El aceite usado ya no va al desagüe. Gano puntos, cuido el medio ambiente y mis clientes lo valoran."', avatar: 'AP', points: 4100, level: 'Eco Embajador' },
+  { name: 'María González', role: 'Vecina, El Prado', text: 'Por fin sé exactamente cuándo pasa el camión. Ya no tengo que dejar la bolsa en la esquina desde la noche anterior.', avatar: 'MG', points: 2340, level: 'Eco Guardián', badges: [
+    { icon: MapPinIcon, text: 'El Prado' },
+    { icon: Sparkles, text: 'Eco Activo' }
+  ]},
+  { name: 'Carlos Mendoza', role: 'Conductor ECO-001', text: 'La app me optimiza la ruta y los vecinos salen a tiempo. Antes perdía 40 min esperando; ahora todo fluye.', avatar: 'CM', points: 0, level: 'Operador', badges: [
+    { icon: MapPinIcon, text: '142 rutas' },
+    { icon: Truck, text: 'Flota Activa' }
+  ]},
+  { name: 'Ana Patricia', role: 'Comerciante, Centro', text: 'El aceite usado ya no va al desagüe. Gano puntos, cuido el medio ambiente y mis clientes lo valoran.', avatar: 'AP', points: 4100, level: 'Eco Embajador', badges: [
+    { icon: MapPinIcon, text: 'Centro' },
+    { icon: Award, text: 'Comerciante Verde' }
+  ]},
 ];
 
 const liveMetrics = [
@@ -45,6 +55,14 @@ export default function Landing() {
   const ctaRef = useRef(null);
   const metricsRef = useRef(null);
   const [activeStep, setActiveStep] = useState(0);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [userTestimonials, setUserTestimonials] = useState(() => {
+    try {
+      const stored = localStorage.getItem('ecoruta_user_testimonials');
+      return stored ? JSON.parse(stored) : [];
+    } catch { return []; }
+  });
+  const [formData, setFormData] = useState({ name: '', role: '', comment: '' });
 
   // Ensure containerRef is set before GSAP runs by using a selector scope
   useGSAP((ctx) => {
@@ -405,13 +423,32 @@ export default function Landing() {
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="section-title">Lo que dice la comunidad</h2>
             <p className="section-subtitle">Historias reales de vecinos que transformaron sus hábitos</p>
+            <button
+              onClick={() => setShowShareModal(true)}
+              className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-sm font-medium text-[var(--text-secondary)] hover:border-[var(--accent)] hover:text-[var(--accent)] hover:bg-[var(--accent)]/5 transition-all duration-200"
+              aria-label="Compartir mi experiencia"
+            >
+              <Plus className="w-4 h-4" aria-hidden="true" />
+              Compartir mi experiencia
+            </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {testimonials.map((testimonial) => (
-              <div key={testimonial.name} className="testimonial-card surface-panel card-padded">
+            {[
+              ...userTestimonials.slice(0, 3).map((t, i) => ({
+                ...t,
+                isUser: true,
+                key: `user-${i}`
+              })),
+              ...testimonials.slice(0, 3 - userTestimonials.length)
+            ].map((testimonial) => (
+              <div key={testimonial.key || testimonial.name} className="testimonial-card surface-panel card-padded flex flex-col">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent-hover)] flex items-center justify-center font-display font-bold text-white text-lg">
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center font-display font-bold text-white text-lg ${
+                    testimonial.isUser
+                      ? 'bg-gradient-to-br from-[var(--accent-sky)] to-[var(--accent-lime)]'
+                      : 'bg-gradient-to-br from-[var(--accent)] to-[var(--accent-hover)]'
+                  }`}>
                     {testimonial.avatar}
                   </div>
                   <div>
@@ -419,21 +456,131 @@ export default function Landing() {
                     <p className="text-sm text-[var(--text-secondary)]">{testimonial.role}</p>
                   </div>
                 </div>
-                <p className="text-[var(--text-secondary)] mb-6 leading-relaxed">"{testimonial.text}"</p>
-                {testimonial.points > 0 && (
-                  <div className="flex items-center gap-4 text-sm">
-                    <span className="flex items-center gap-1 text-[var(--accent)] font-medium">
-                      <Award className="w-4 h-4" aria-hidden="true" />
-                      {testimonial.points.toLocaleString()} pts
+                <p className="text-[var(--text-secondary)] mb-4 leading-relaxed flex-1">{testimonial.text}</p>
+                <div className="flex flex-wrap items-center gap-2.5 mt-auto">
+                  {testimonial.badges?.map((badge, i) => (
+                    <span key={i} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-xs font-medium text-[var(--text-secondary)]">
+                      <badge.icon className="w-3.5 h-3.5 text-[var(--accent)]" aria-hidden="true" />
+                      {badge.text}
                     </span>
-                    <span className="badge bg-gradient-to-r from-[var(--accent)] via-[var(--accent-hover)] to-[var(--accent-sky)] text-white border-transparent">{testimonial.level}</span>
-                  </div>
-                )}
+                  ))}
+                  {!testimonial.isUser && testimonial.points > 0 && (
+                    <>
+                      <span className="flex items-center gap-1 text-[var(--accent)] font-medium text-sm">
+                        <Award className="w-4 h-4" aria-hidden="true" />
+                        {testimonial.points.toLocaleString()} pts
+                      </span>
+                      <span className="badge bg-gradient-to-r from-[var(--accent)] via-[var(--accent-hover)] to-[var(--accent-sky)] text-white border-transparent">{testimonial.level}</span>
+                    </>
+                  )}
+                  {testimonial.isUser && (
+                    <span className="badge badge-premium text-xs">Nuevo</span>
+                  )}
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
+
+      {/* Share Experience Modal */}
+      {showShareModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+          <div className="w-full max-w-md rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between p-5 border-b border-[var(--border-subtle)]">
+              <h3 id="modal-title" className="font-display font-semibold text-h3 text-[var(--text-primary)]">Compartir mi experiencia</h3>
+              <button
+                onClick={() => { setShowShareModal(false); setFormData({ name: '', role: '', comment: '' }); }}
+                className="w-8 h-8 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors flex items-center justify-center"
+                aria-label="Cerrar modal"
+              >
+                <X className="w-5 h-5" aria-hidden="true" />
+              </button>
+            </div>
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              if (!formData.name.trim() || !formData.role.trim() || !formData.comment.trim()) return;
+              const newTestimonial = {
+                name: formData.name.trim(),
+                role: formData.role.trim(),
+                text: formData.comment.trim(),
+                avatar: formData.name.trim().split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2),
+                badges: [
+                  { icon: User, text: formData.role.trim().split(',')[0].trim() },
+                  { icon: Sparkles, text: 'Nuevo miembro' }
+                ],
+                isUser: true,
+                timestamp: Date.now()
+              };
+              const updated = [newTestimonial, ...userTestimonials].slice(0, 6);
+              setUserTestimonials(updated);
+              localStorage.setItem('ecoruta_user_testimonials', JSON.stringify(updated));
+              setShowShareModal(false);
+              setFormData({ name: '', role: '', comment: '' });
+              toast.success('¡Gracias por compartir tu experiencia con EcoRuta!', {
+                description: 'Tu testimonio aparecerá en la comunidad',
+                duration: 4000
+              });
+            }} className="p-5 space-y-4">
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-[var(--text-primary)] mb-1.5">Nombre</label>
+                <input
+                  id="name"
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  maxLength={40}
+                  className="w-full px-4 py-2.5 rounded-xl bg-[var(--bg-canvas)] border border-[var(--border-subtle)] text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent transition-all"
+                  placeholder="Tu nombre"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="role" className="block text-sm font-medium text-[var(--text-primary)] mb-1.5">Barrio o Rol</label>
+                <input
+                  id="role"
+                  type="text"
+                  value={formData.role}
+                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                  maxLength={40}
+                  className="w-full px-4 py-2.5 rounded-xl bg-[var(--bg-canvas)] border border-[var(--border-subtle)] text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent transition-all"
+                  placeholder="Ej: Vecino, Kennedy / Comerciante, Centro"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="comment" className="block text-sm font-medium text-[var(--text-primary)] mb-1.5">Tu experiencia <span className="text-[var(--text-muted)]">({formData.comment.length}/180)</span></label>
+                <textarea
+                  id="comment"
+                  value={formData.comment}
+                  onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
+                  maxLength={180}
+                  rows={4}
+                  className="w-full px-4 py-2.5 rounded-xl bg-[var(--bg-canvas)] border border-[var(--border-subtle)] text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent transition-all resize-none"
+                  placeholder="Cuéntanos cómo EcoRuta cambió tu rutina de reciclaje..."
+                  required
+                />
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => { setShowShareModal(false); setFormData({ name: '', role: '', comment: '' }); }}
+                  className="flex-1 px-5 py-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-canvas)] text-[var(--text-secondary)] font-medium hover:bg-[var(--bg-elevated)] hover:border-[var(--accent)]/50 hover:text-[var(--accent)] transition-all"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={!formData.name.trim() || !formData.role.trim() || !formData.comment.trim()}
+                  className="flex-1 px-5 py-2.5 rounded-xl bg-[var(--accent)] text-white font-medium hover:bg-[var(--accent-hover)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2 focus:ring-offset-[var(--bg-surface)] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                >
+                  Publicar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* CTA Section */}
       <section ref={ctaRef} className="py-12 lg:py-16 relative overflow-hidden">

@@ -2,7 +2,7 @@ import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
   testDir: '.',
-  testMatch: 'test-routes.mjs',
+  testMatch: ['test-routes.mjs', 'test-playwright.mjs'],
   use: {
     baseURL: 'http://localhost:4173',
     headless: true,
