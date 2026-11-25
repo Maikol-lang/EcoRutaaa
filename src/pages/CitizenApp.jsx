@@ -59,9 +59,9 @@ const mockNotifications = [
 
 const getTypeStyles = (type) => {
   const styles = {
-    white: { bg: 'bg-slate-200/15 dark:bg-slate-200/15', border: 'border-slate-200/20 dark:border-slate-200/20', text: 'text-slate-700 dark:text-slate-200', iconBg: 'bg-slate-200/15 dark:bg-slate-200/15', accent: 'var(--text-muted)' },
-    green: { bg: 'bg-[var(--accent-lime)]/5', border: 'border-[var(--accent-lime)]/10', text: 'text-[var(--accent-lime)]', iconBg: 'bg-[var(--accent-lime)]/10', accent: 'var(--accent-lime)' },
-    black: { bg: 'bg-[var(--text-muted)]/5', border: 'border-[var(--text-muted)]/10', text: 'text-[var(--text-muted)]', iconBg: 'bg-[var(--text-muted)]/10', accent: 'var(--text-muted)' },
+    white: { bg: 'bg-[var(--bg-surface)]', border: 'border border-[var(--border-subtle)]', text: 'text-[var(--text-primary)]', iconBg: 'bg-slate-100 border border-slate-300 dark:bg-white/15 dark:border-white/25', iconColor: 'text-slate-900 dark:text-white', accent: 'var(--accent)' },
+    green: { bg: 'bg-[var(--accent-lime)]/5', border: 'border-[var(--accent-lime)]/10', text: 'text-[var(--accent-lime)]', iconBg: 'bg-[var(--accent-lime)]/10', iconColor: 'text-[var(--accent-lime)]', accent: 'var(--accent-lime)' },
+    black: { bg: 'bg-[var(--text-muted)]/5', border: 'border-[var(--text-muted)]/10', text: 'text-[var(--text-muted)]', iconBg: 'bg-[var(--text-muted)]/10', iconColor: 'text-[var(--text-muted)]', accent: 'var(--text-muted)' },
   };
   return styles[type] || styles.white;
 };
@@ -336,7 +336,7 @@ export default function CitizenApp() {
               <div key={i} className={`card-interactive card-padded ${styles.bg} ${styles.border} flex flex-col items-center text-center gap-2`}>
                 <div className="flex items-center gap-2">
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${styles.iconBg} border border-current/20`}>
-                    <Icon className="w-4 h-4" style={{ color: styles.accent }} aria-hidden="true" />
+                    <Icon className={`w-4 h-4 ${styles.iconColor}`} aria-hidden="true" />
                   </div>
                   <span className="font-medium text-sm text-[var(--text-primary)]">{pickup.label}</span>
                 </div>
@@ -397,7 +397,7 @@ export default function CitizenApp() {
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 relative z-10">
                       <div className="flex items-center gap-4">
                         <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${styles.iconBg} border border-current/20`}>
-                          <Icon className="w-6 h-6" style={{ color: styles.accent }} aria-hidden="true" />
+                          <Icon className={`w-6 h-6 ${styles.iconColor}`} aria-hidden="true" />
                         </div>
                         <div>
                           <h3 className="font-semibold text-lg text-[var(--text-primary)]">{pickup.label}</h3>
@@ -449,7 +449,7 @@ export default function CitizenApp() {
                     <div key={type} className={`content-card card-interactive card-padded ${styles.bg} ${styles.border}`}>
                       <div className="flex items-center gap-3 mb-4">
                         <div className={`w-11 h-11 rounded-lg flex items-center justify-center ${styles.iconBg} border border-current/20`}>
-                          <TypeIcon className="w-5 h-5" style={{ color: styles.accent }} aria-hidden="true" />
+                          <TypeIcon className={`w-5 h-5 ${styles.iconColor}`} aria-hidden="true" />
                         </div>
                         <div>
                           <h3 className="font-semibold text-lg text-[var(--text-primary)]">{type === 'white' ? 'Aprovechables' : type === 'green' ? 'Orgánicos' : 'No Aprovechables'}</h3>
