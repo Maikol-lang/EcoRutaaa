@@ -229,8 +229,8 @@ export default function CitizenApp() {
 
   return (
     <div className="min-h-screen pb-16 bg-[var(--bg-canvas)]">
-      {/* Header Section - SaaS Command Center */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#064E3B] via-[#0B132B] to-[#090A0F] text-white">
+      {/* Header Section - Adaptive theme */}
+      <section className="relative overflow-hidden bg-gradient-to-b from-[var(--accent)]/10 via-[var(--bg-canvas)] to-[var(--bg-canvas)] border-b border-[var(--border-subtle)]">
         <div className="absolute inset-0" aria-hidden="true">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-[var(--accent)]/10 blur-3xl" />
           <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-[var(--accent-lime)]/5 blur-3xl" />
@@ -239,17 +239,17 @@ export default function CitizenApp() {
           <div className="max-w-7xl mx-auto">
             {/* Neighborhood Selector */}
             <div className="mb-6">
-              <label className="block text-sm font-medium mb-2 text-white/80">Mi barrio / sector</label>
+              <label className="block text-sm font-medium mb-2 text-[var(--text-secondary)]">Mi barrio / sector</label>
               <div className="relative">
-                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60" aria-hidden="true" />
+                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--text-muted)]" aria-hidden="true" />
                 <select
                   value={selectedBarrio}
                   onChange={e => setSelectedBarrio(e.target.value)}
-                  className="input-field pl-12 pr-10 py-3.5 appearance-none bg-white/10 border-white/20 text-white placeholder-white/60 focus:border-[var(--accent-lime)] focus:ring-[var(--accent-lime)]/20"
+                  className="input-field pl-12 pr-10 py-3.5 appearance-none bg-[var(--bg-surface)] border-[var(--border-subtle)] text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:border-[var(--accent-lime)] focus:ring-[var(--accent-lime)]/20"
                 >
                   {NEIGHBORHOODS.map(n => <option key={n} value={n}>{n}</option>)}
                 </select>
-                <svg className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <svg className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none text-[var(--text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                 </svg>
               </div>
@@ -258,66 +258,66 @@ export default function CitizenApp() {
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
               <div>
                 <p className="text-[var(--accent-lime)] text-sm font-medium uppercase tracking-wider">Panel Ciudadano</p>
-                <h1 className="font-display font-bold text-display-md lg:text-display-lg text-white mt-1">
+                <h1 className="font-display font-bold text-display-md lg:text-display-lg text-[var(--text-primary)] mt-1">
                   Hola, {user?.name || 'Vecino'} 👋
                 </h1>
-                <p className="text-white/60 mt-2">Tu barrio: <span className="text-[var(--accent-lime)] font-semibold">{selectedBarrio}</span></p>
+                <p className="text-[var(--text-secondary)] mt-2">Tu barrio: <span className="text-[var(--accent-lime)] font-semibold">{selectedBarrio}</span></p>
               </div>
               <div className="flex flex-wrap items-center gap-3">
-                <button onClick={handleRefresh} disabled={isLoading} className="btn-secondary flex items-center gap-2 border-white/20 text-white hover:bg-white/10">
+                <button onClick={handleRefresh} disabled={isLoading} className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--bg-surface)] text-[var(--text-primary)] border border-[var(--border-subtle)] hover:border-[var(--accent)] hover:bg-[var(--bg-elevated)] transition-all duration-200 disabled:opacity-50">
                   <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} aria-hidden="true" />
                   Actualizar
                 </button>
-                <NavLink to="/map" className="btn-ghost flex items-center gap-2 text-white hover:bg-white/10">
+                <NavLink to="/map" className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--bg-surface)] text-[var(--text-primary)] border border-[var(--border-subtle)] hover:border-[var(--accent)] hover:bg-[var(--bg-elevated)] transition-all duration-200">
                   <Map className="w-4 h-4" aria-hidden="true" />
                   Ver Mapa
                 </NavLink>
               </div>
             </div>
 
-            {/* Quick Stats - Monospace for metrics */}
+            {/* Quick Stats - 4 KPI Cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="card-interactive card-padded bg-white/5 border-white/10 backdrop-blur-sm">
+              <div className="card-interactive card-padded bg-[var(--bg-surface)] border border-[var(--border-subtle)]">
                 <div className="flex items-center gap-3">
                   <div className="w-11 h-11 rounded-lg bg-[var(--accent)]/10 border border-[var(--accent)]/20 flex items-center justify-center">
                     <Route className="w-5 h-5 text-[var(--accent)]" aria-hidden="true" />
                   </div>
                   <div>
                     <p className="font-mono font-bold text-2xl lg:text-3xl text-[var(--accent-lime)] tabular-nums">3</p>
-                    <p className="text-xs text-white/50">Rutas activas hoy</p>
+                    <p className="text-xs text-[var(--text-secondary)]">Rutas activas hoy</p>
                   </div>
                 </div>
               </div>
-              <div className="card-interactive card-padded bg-white/5 border-white/10 backdrop-blur-sm">
+              <div className="card-interactive card-padded bg-[var(--bg-surface)] border border-[var(--border-subtle)]">
                 <div className="flex items-center gap-3">
                   <div className="w-11 h-11 rounded-lg bg-[var(--accent)]/10 border border-[var(--accent)]/20 flex items-center justify-center">
                     <Award className="w-5 h-5 text-[var(--accent)]" aria-hidden="true" />
                   </div>
                   <div>
                     <p className="font-mono font-bold text-2xl lg:text-3xl text-[var(--accent)] tabular-nums">{userPoints.toLocaleString()}</p>
-                    <p className="text-xs text-white/50">EcoPuntos totales</p>
+                    <p className="text-xs text-[var(--text-secondary)]">EcoPuntos totales</p>
                   </div>
                 </div>
               </div>
-              <div className="card-interactive card-padded bg-white/5 border-white/10 backdrop-blur-sm">
+              <div className="card-interactive card-padded bg-[var(--bg-surface)] border border-[var(--border-subtle)]">
                 <div className="flex items-center gap-3">
                   <div className="w-11 h-11 rounded-lg bg-[var(--accent-sky)]/10 border border-[var(--accent-sky)]/20 flex items-center justify-center">
                     <Calendar className="w-5 h-5 text-[var(--accent-sky)]" aria-hidden="true" />
                   </div>
                   <div>
                     <p className="font-mono font-bold text-2xl lg:text-3xl text-[var(--accent-sky)] tabular-nums">8</p>
-                    <p className="text-xs text-white/50">Visitas este mes</p>
+                    <p className="text-xs text-[var(--text-secondary)]">Visitas este mes</p>
                   </div>
                 </div>
               </div>
-              <div className="card-interactive card-padded bg-white/5 border-white/10 backdrop-blur-sm">
+              <div className="card-interactive card-padded bg-[var(--bg-surface)] border border-[var(--border-subtle)]">
                 <div className="flex items-center gap-3 flex-col sm:flex-row sm:items-center">
                   <div className="w-11 h-11 rounded-lg bg-[var(--accent-amber)]/10 border border-[var(--accent-amber)]/20 flex items-center justify-center">
                     <span className="text-xl">🏆</span>
                   </div>
                   <div className="text-center sm:text-left">
                     <p className="font-display font-bold text-lg sm:text-2xl lg:text-3xl text-[var(--accent-amber)] leading-tight">{user?.level || 'Eco Guardián'}</p>
-                    <p className="text-xs text-white/50">Nivel actual</p>
+                    <p className="text-xs text-[var(--text-secondary)]">Nivel actual</p>
                   </div>
                 </div>
               </div>
